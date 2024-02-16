@@ -1,20 +1,14 @@
 import streamlit as st
 # import numpy as np
 import pandas as pd
-import requests
-import json
 from daily_values import daily_values as dv
+import requests
 
 # map_data = pd.DataFrame(
 #     np.random.randn(1000,2) / [50,50] + [37.76, -122.4],
 #     columns=['lat', 'lon'])
 
 # st.map(map_data)
-# search_endpoint = "https://api.nal.usda.gov/fdc/v1/foods/list"
-
-DEMO_KEY = "DEMO_KEY"
-search_endpoint = "https://api.nal.usda.gov/fdc/v1/foods/search"
-
 
 st.title('Nutrition Guide')
 search = st.text_input('Search an ingredient:')
@@ -33,36 +27,7 @@ results_df = pd.DataFrame(data=results_nutrients, columns=['nutrientName', 'valu
 
 
 st.title('Results:')
-st.write(f'Food Name: {results_name}')
-# st.write(results_nutrients[0].get('nutrientName'))
-# st.write(results_nutrients[0])
-st.write('Food Nutrients (filtered table):')
-st.write(results_df)
-# st.dataframe(
-#     data=results_nutrients,
-#     column_order=('nutrientName', 'value', 'unitName')
-#     # column_config={
-#     #     'nutrientName': st.column_config.Column(label = 'Nutrient'),
-#     #     'value': st.column_config.Column(label = 'Amount'),
-#     #     'unitName': st.column_config.Column(label = 'Units')
-#     # }
-# )
-# st.dataframe(data=results_nutrients, column_order={'nutrientName', 'value', 'unitName'})
-st.write('Food Nutrients (full table, reference):')
-st.dataframe(results_nutrients)
-st.write('Food Nutrients (unformatted, reference):')
-st.write(results_nutrients)
-
-
-# """
-# You can further use the api explorer here: https://app.swaggerhub.com/apis/fdcnal/food-data_central_api/1.0.1#/FDC/getFoodsSearch
-# to see the different parameters you can use to customize your search and review the 'shape' of the response.
-# """
-
-
-
-
-# results = pd.DataFrame.query(selfexpr=search.lower(), )
+results = pd.DataFrame.query(selfexpr=search.lower(), )
 # results = dv.get(search.lower())
 # st.write(results)
 
