@@ -84,12 +84,22 @@ ingredients_list.write(ingredients['nutrients'])
 
 with nutrients_have:
     st.subheader('Nutrients I Have:')
+    st.write('Still building this:')
+    st.write(
+        pd.DataFrame(
+            data=(
+                [1, 2, 3, 4, 5],
+                ['a', 'b', 'c', 'd', 'e'],
+                [0, 0, 0, 0, 0]
+            )
+        )
+    )
 
 with nutrients_need:
     st.subheader('Nutrients I Still Need:')
     st.write('% Daily Values:')
     st.write(
-        pd.DataFrame(
-            data=dv
-            )
+        pd.DataFrame
+            .from_dict(dv, orient='index')
+            .rename(columns={'value': 'Amount', 'unit': 'Units'})
         )
