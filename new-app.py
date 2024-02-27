@@ -2,7 +2,7 @@ import streamlit as st
 # import numpy as np
 import pandas as pd
 import os
-from daily_values import daily_values as dv
+from daily_values import daily_values as dv, dailyvalues_blank as dvb
 import requests
 from pprint import pprint as pp
 
@@ -70,7 +70,7 @@ ingredients_list.write(ingredients['foodname'])
 ingredients_list.write('List of ingredients:')
 ingredients_list.write(ingredients['nutrients'])
 
-# if st.button:
+# if st.button: 
 #     ingredients[search] = results
 #     st.write(ingredients)
 
@@ -84,22 +84,26 @@ ingredients_list.write(ingredients['nutrients'])
 
 with nutrients_have:
     st.subheader('Nutrients I Have:')
-    st.write('Still building this:')
+    mylist_have = dvb
+    # for key in mylist_have:
+    #     mylist_have[key]['value'] = 3
     st.write(
-        pd.DataFrame(
-            data=(
-                [1, 2, 3, 4, 5],
-                ['a', 'b', 'c', 'd', 'e'],
-                [0, 0, 0, 0, 0]
-            )
+        pd.DataFrame
+            .from_dict(mylist_have, orient='index')
+            .rename(columns={'value': 'Amount', 'unit': 'Units'})
         )
-    )
 
 with nutrients_need:
     st.subheader('Nutrients I Still Need:')
     st.write('% Daily Values:')
+    mylist_need = {}
+    for key in dv:
+        if key in mylist_have:
+            mylist_need[key] = {
+                'value' : dv[key]['value'] - mylist_have[key]['value']
+                }
     st.write(
         pd.DataFrame
-            .from_dict(dv, orient='index')
+            .from_dict(mylist_need, orient='index')
             .rename(columns={'value': 'Amount', 'unit': 'Units'})
         )
