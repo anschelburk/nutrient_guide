@@ -64,6 +64,27 @@ with ingredients_search:
     button_addtolist = st.button('Add to My Ingredients List')
     button_remove = st.button('Remove from My Ingredients List')
     st.write(results_df)
+    ingredients_filtered = {}
+    # for key in results_nutrients:
+    #     ingredients_filtered[results_nutrients][key]['nutrientName'] = {
+    #         'value' : results_nutrients[key]['value'],
+    #         'unit' : results_nutrients[key]['unitName']
+    #     }
+    # for key in results_nutrients:
+    #     ingredients_filtered.update(
+    #         results_nutrients[key]['nutrientName'] : {
+    #                 'value' : results_nutrients[key]['value'],
+    #                 'unit' : results_nutrients[key]['unitName']
+    #          }
+    #     )
+    st.write(results_nutrients[0]['nutrientName'])
+    st.write(results_nutrients)
+    # ingredients_dict = {
+    #     results_nutrients['nutrientName'] : {
+    #         'value' : results_nutrients['value'],
+    #         'unit' : results_nutrients['unitName']
+    #     }
+    # }
 
 # ingredients_search.subheader(f'Showing results for: {results_name}')
 # button_addtolist = ingredients_search.button('Add to My Ingredients List')
@@ -82,14 +103,12 @@ mylist_ingredients = []
 
 if button_addtolist:
     mylist_ingredients.append(results_name)
-    ingredients['nutrients'].append(results_nutrients)
+    # ingredients['nutrients'].append(results_nutrients)
     # ingredient_new = {results_name: results_df}
     # ingredients = ingredients.append(ingredient_new)
 
 # if button_remove:
     # mylist_ingredients.remove(results_name)
-
-
 
 with ingredients_list:
     st.subheader('My Ingredients List:')
