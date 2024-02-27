@@ -28,6 +28,8 @@ search = ingredients_search.text_input('To search an ingredient, type it below a
 
 r = requests.get(search_endpoint, params={"query": search, "api_key":DEMO_KEY}) # using the requests library to make a GET request to the API
 results_name = r.json().get('foods')[0].get('description')
+if search == '':
+    results_name = ''
 # results_name = 'Name-goes-here'
 results_nutrients = r.json().get('foods')[0].get('foodNutrients') # getting the JSON object of the response and navigating to the foodNutrients key
 results_df = pd.DataFrame(data=results_nutrients, columns=['nutrientName', 'value', 'unitName'])
@@ -46,6 +48,7 @@ results_df.index = range(1, len(results_df)+1)
 
 ingredients_search.subheader(f'Showing results for: {results_name}')
 button_addtolist = ingredients_search.button('Add to My Ingredients List')
+button_remove = ingredients_search.button('Remove from My Ingredients List')
 ingredients_search.write(results_df)
 
 # results = pd.DataFrame.query(selfexpr=search.lower(), )
@@ -56,19 +59,25 @@ ingredients_search.write(results_df)
 # dict_nutrients = []
 ingredients = {'foodname':[], 'nutrients':[]}
 
+mylist_ingredients = []
+
 if button_addtolist:
-    ingredients['foodname'].append(results_name)
+    mylist_ingredients.append(results_name)
     ingredients['nutrients'].append(results_nutrients)
     # ingredient_new = {results_name: results_df}
     # ingredients = ingredients.append(ingredient_new)
 
+# if button_remove:
+    # mylist_ingredients.remove(results_name)
 
 
-ingredients_list.subheader('My Ingredients List:')
-ingredients_list.write('List of food names:')
-ingredients_list.write(ingredients['foodname'])
-ingredients_list.write('List of ingredients:')
-ingredients_list.write(ingredients['nutrients'])
+
+with ingredients_list:
+    st.subheader('My Ingredients List:')
+    mylist_bullets = ''
+    for i in mylist_ingredients:
+        mylist_bullets += '- ' + i + '\n'
+    st.markdown(mylist_bullets)
 
 # if st.button: 
 #     ingredients[search] = results
@@ -94,13 +103,13 @@ with nutrients_have:
         )
 
 with nutrients_need:
-    st.subheader('Nutrients I Still Need:')
-    st.write('% Daily Values:')
+    st.subheader('Nutrients I Need:')
     mylist_need = {}
     for key in dv:
         if key in mylist_have:
             mylist_need[key] = {
-                'value' : dv[key]['value'] - mylist_have[key]['value']
+                'value' : dv[key]['value'] - mylist_have[key]['value'],
+                'unit' : dv[key]['unit']
                 }
     st.write(
         pd.DataFrame
