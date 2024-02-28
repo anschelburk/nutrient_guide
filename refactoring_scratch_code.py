@@ -119,6 +119,7 @@ if __name__ == '__main__':
             draw_table_json_data(results_nutrients)
             
         else:
+            #st.write() doesn't seem to be able to recognize '\n'?
             st.write(f'No results yet. Need help getting started? Try searching **sweet potato**.')
 
     with my_ingredients_list:
