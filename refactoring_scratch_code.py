@@ -5,6 +5,10 @@ import streamlit as st
 
 from daily_values import daily_values as dv, dailyvalues_blank as dv_blank
 
+DEMO_KEY = os.getenv('DEMO_KEY', "") # <-- change to 'search_key'
+search_endpoint = 'https://api.nal.usda.gov/fdc/v1/foods/search'
+
+@st.cache_data
 def add_daily_value_dicts(dict1: dict, dict2: dict): # <-- not used yet
     final_added_dict = {}
     for key in dict1:
@@ -15,6 +19,7 @@ def add_daily_value_dicts(dict1: dict, dict2: dict): # <-- not used yet
             }    
     return(final_added_dict)
 
+@st.cache_data
 def add_item_to_list(item_name, list_name: list):
     return(list_name.append(item_name))
 
@@ -50,14 +55,36 @@ def draw_table_json_data(data_source):
     results_df.index = range(1, len(results_df)+1)
     st.write(results_df)
 
+@st.cache_data
+def get_search_results_data(searchbar_input):
+    results = requests.get(
+        search_endpoint,
+        params={"query" : searchbar_input, "api_key" : DEMO_KEY}
+        )
+    return(results)
+
+@st.cache_data
+def get_search_results_name(searchbar_input):
+    results = get_search_results_data(searchbar_input)
+    results_name = results.json().get('foods')[0].get('description')
+    return(results_name)
+
+@st.cache_data
+def get_search_results_nutrients(searchbar_input):
+    results = get_search_results_data(searchbar_input)
+    results_nutrients = results.json().get('foods')[0].get('foodNutrients')
+    return(results_nutrients)
+
 def print_list_as_bullets(list_name: list):
     mylist_bullets = ''
     for item in list_name:
         mylist_bullets += '- ' + item + '\n'
     st.markdown(mylist_bullets)
 
+@st.cache_data
 def remove_item_from_list(item_name, list_name: list):
     return(list_name.remove(item_name))
+
 
 def subtract_daily_value_dicts(dict1: dict, dict2: dict):
     final_subtracted_dict = {}
@@ -68,9 +95,6 @@ def subtract_daily_value_dicts(dict1: dict, dict2: dict):
                 'unit' : dict1[key]['unit']
             }    
     return(final_subtracted_dict)
-
-DEMO_KEY = os.getenv('DEMO_KEY', "") # <-- change to 'search_key'
-search_endpoint = 'https://api.nal.usda.gov/fdc/v1/foods/search'
 
 if __name__ == '__main__':
 
@@ -93,17 +117,12 @@ if __name__ == '__main__':
         st.header('Search an Ingredient')
 
         search = st.text_input(
-            'Start by typing an ingredient below, and pressing ENTER.'
+            'Start by typing a food or ingredient below, and then press ENTER.'
         )
-
-        results = requests.get(
-            search_endpoint,
-            params={"query" : search, "api_key" : DEMO_KEY}
-            )
     
         if search:
-            results_name = results.json().get('foods')[0].get('description')
-            results_nutrients = results.json().get('foods')[0].get('foodNutrients')
+            results_name = get_search_results_name(search)
+            results_nutrients = get_search_results_nutrients(search)
             st.write(f'**Showing results for:** {results_name}')
             
             print('Just before add button')
