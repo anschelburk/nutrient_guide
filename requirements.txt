@@ -24,6 +24,8 @@ gitdb==4.0.11
     # via gitpython
 gitpython==3.1.41
     # via streamlit
+greenlet==3.0.3
+    # via sqlalchemy
 idna==3.6
     # via requests
 importlib-metadata==7.0.1
@@ -89,6 +91,8 @@ six==1.16.0
     # via python-dateutil
 smmap==5.0.1
     # via gitdb
+sqlalchemy==1.4.0
+    # via -r requirements.in
 streamlit==1.31.1
     # via -r requirements.in
 tenacity==8.2.3

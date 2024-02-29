@@ -84,10 +84,72 @@ def get_search_results_nutrients(searchbar_input):
 def initialize_once(): # <-- alphabetize
     return {'initialized': False}
 
-def perform_initialization(data: dict): # <-- alphabetize
-    if not data['initialized']:
-        print('Initializing once...')
-        data['initialized'] = True
+def perform_initialization(): # <-- alphabetize
+    """
+    This function is called once at the beginning of the app.
+    """
+    print('Initializing once...')
+
+    st.title('Nutrition Guide')
+
+    mutable_ingredients_list = []
+    (search_an_ingredient,
+        my_ingredients_list,
+        nutrients_i_have,
+        nutrients_i_need) = st.columns((3, 2, 2, 2))
+
+    with search_an_ingredient:
+        st.header('Search an Ingredient')
+
+        search = st.text_input(
+            'Start by typing a food or ingredient below, and then press ENTER.'
+        )
+
+
+        if search:
+            st.write(f'**Showing results for:** {get_search_results_name(search)}')
+            
+            # print('Just before add button')
+            # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+            button_add_to_list(
+                get_search_results_name(search),
+                mutable_ingredients_list
+            )
+            # print('Just after add button')
+            # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+            # print('Just before remove button')
+            # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+            button_remove_from_list(
+                get_search_results_name(search),
+                mutable_ingredients_list
+            )
+            # print('Just after remove button.')
+            # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+            draw_table_json_data(
+                get_search_results_nutrients(search)
+            )
+            
+        else:
+            #st.write() doesn't seem to be able to recognize '\n'?
+            st.write(f'No results yet. Need help getting started? Try searching **sweet potato**.')
+
+    with my_ingredients_list:
+        st.subheader('My Ingredients List')
+        print_list_as_bullets(mutable_ingredients_list)
+
+    with nutrients_i_have:
+        st.subheader('Nutrients I Have')
+        nutrients_i_have_dict = dv_blank
+        draw_table_daily_values(nutrients_i_have_dict)
+
+    with nutrients_i_need:
+        st.subheader('Nutrients I Need')
+        nutrients_i_need_dict = subtract_daily_value_dicts(
+            dv, nutrients_i_have_dict
+            )
+        draw_table_daily_values(nutrients_i_need_dict)
+
+    return None
 
 def print_list_as_bullets(list_name: list):
     mylist_bullets = ''
@@ -110,22 +172,20 @@ def subtract_daily_value_dicts(dict1: dict, dict2: dict):
             }    
     return(final_subtracted_dict)
 
-if __name__ == '__main__':
+st.button('', on_click=perform_initialization())
 
-    st.set_page_config(layout='wide')
+# if __name__ == '__main__':
 
-    initialized_data = initialize_once()
-    # initialized_data['initialized'] currently == False
-    # Put anything below that just needs to happen once.
-    breakpoint()
+#     st.set_page_config(layout='wide')
 
-    mutable_ingredients_list = []
-    breakpoint()
+#     initialized_data = initialize_once()
+#     # initialized_data['initialized'] currently == False
+#     # Put anything below that just needs to happen once.
 
-    perform_initialization(initialized_data)
-    breakpoint()
+#     mutable_ingredients_list = []
 
-    if initialized_data['initialized']:
+
+#     if initialized_data['initialized']:
 
         # print('this prints just after the __main__ statement')
 
@@ -135,59 +195,59 @@ if __name__ == '__main__':
         # print('Just after mutable_ingredients_list')
         # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
 
-        st.title('Nutrition Guide')
+        # st.title('Nutrition Guide')
 
-        (search_an_ingredient,
-            my_ingredients_list,
-            nutrients_i_have,
-            nutrients_i_need) = st.columns((3, 2, 2, 2))
+        # (search_an_ingredient,
+        #     my_ingredients_list,
+        #     nutrients_i_have,
+        #     nutrients_i_need) = st.columns((3, 2, 2, 2))
 
-        with search_an_ingredient:
-            st.header('Search an Ingredient')
+        # with search_an_ingredient:
+        #     st.header('Search an Ingredient')
 
-            search = st.text_input(
-                'Start by typing a food or ingredient below, and then press ENTER.'
-            )
+        #     search = st.text_input(
+        #         'Start by typing a food or ingredient below, and then press ENTER.'
+        #     )
 
-            if search:
-                st.write(f'**Showing results for:** {get_search_results_name(search)}')
+        #     if search:
+        #         st.write(f'**Showing results for:** {get_search_results_name(search)}')
                 
-                # print('Just before add button')
-                # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
-                button_add_to_list(
-                    get_search_results_name(search),
-                    mutable_ingredients_list
-                )
-                # print('Just after add button')
-                # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
-                # print('Just before remove button')
-                # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
-                button_remove_from_list(
-                    get_search_results_name(search),
-                    mutable_ingredients_list
-                )
-                # print('Just after remove button.')
-                # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
-                draw_table_json_data(
-                    get_search_results_nutrients(search)
-                )
+        #         # print('Just before add button')
+        #         # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+        #         button_add_to_list(
+        #             get_search_results_name(search),
+        #             mutable_ingredients_list
+        #         )
+        #         # print('Just after add button')
+        #         # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+        #         # print('Just before remove button')
+        #         # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+        #         button_remove_from_list(
+        #             get_search_results_name(search),
+        #             mutable_ingredients_list
+        #         )
+        #         # print('Just after remove button.')
+        #         # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+        #         draw_table_json_data(
+        #             get_search_results_nutrients(search)
+        #         )
                 
-            else:
-                #st.write() doesn't seem to be able to recognize '\n'?
-                st.write(f'No results yet. Need help getting started? Try searching **sweet potato**.')
+        #     else:
+        #         #st.write() doesn't seem to be able to recognize '\n'?
+        #         st.write(f'No results yet. Need help getting started? Try searching **sweet potato**.')
 
-        with my_ingredients_list:
-            st.subheader('My Ingredients List')
-            print_list_as_bullets(mutable_ingredients_list)
+        # with my_ingredients_list:
+        #     st.subheader('My Ingredients List')
+        #     print_list_as_bullets(mutable_ingredients_list)
 
-        with nutrients_i_have:
-            st.subheader('Nutrients I Have')
-            nutrients_i_have_dict = dv_blank
-            draw_table_daily_values(nutrients_i_have_dict)
+        # with nutrients_i_have:
+        #     st.subheader('Nutrients I Have')
+        #     nutrients_i_have_dict = dv_blank
+        #     draw_table_daily_values(nutrients_i_have_dict)
 
-        with nutrients_i_need:
-            st.subheader('Nutrients I Need')
-            nutrients_i_need_dict = subtract_daily_value_dicts(
-                dv, nutrients_i_have_dict
-                )
-            draw_table_daily_values(nutrients_i_need_dict)
+        # with nutrients_i_need:
+        #     st.subheader('Nutrients I Need')
+        #     nutrients_i_need_dict = subtract_daily_value_dicts(
+        #         dv, nutrients_i_have_dict
+        #         )
+        #     draw_table_daily_values(nutrients_i_need_dict)
