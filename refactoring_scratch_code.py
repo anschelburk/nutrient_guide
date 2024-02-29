@@ -121,21 +121,27 @@ if __name__ == '__main__':
         )
     
         if search:
-            results_name = get_search_results_name(search)
-            results_nutrients = get_search_results_nutrients(search)
-            st.write(f'**Showing results for:** {results_name}')
+            st.write(f'**Showing results for:** {get_search_results_name(search)}')
             
-            print('Just before add button')
+            # print('Just before add button')
+            # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+            button_add_to_list(
+                get_search_results_name(search),
+                mutable_ingredients_list
+            )
+            # print('Just after add button')
+            # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+            # print('Just before remove button')
+            # print(f'mutable_ingredients_list = {mutable_ingredients_list}')
+            button_remove_from_list(
+                get_search_results_name(search),
+                mutable_ingredients_list
+            )
+            # print('Just after remove button.')
             print(f'mutable_ingredients_list = {mutable_ingredients_list}')
-            button_add_to_list(results_name, mutable_ingredients_list)
-            print('Just after add button')
-            print(f'mutable_ingredients_list = {mutable_ingredients_list}')
-            print('Just before remove button')
-            print(f'mutable_ingredients_list = {mutable_ingredients_list}')
-            button_remove_from_list(results_name, mutable_ingredients_list)
-            print('Just after remove button.')
-            print(f'mutable_ingredients_list = {mutable_ingredients_list}')
-            draw_table_json_data(results_nutrients)
+            draw_table_json_data(
+                get_search_results_nutrients(search)
+            )
             
         else:
             #st.write() doesn't seem to be able to recognize '\n'?
