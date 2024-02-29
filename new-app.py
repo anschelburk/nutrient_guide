@@ -77,8 +77,9 @@ with ingredients_search:
     #                 'unit' : results_nutrients[key]['unitName']
     #          }
     #     )
-    st.write(results_nutrients[0]['nutrientName'])
-    st.write(results_nutrients)
+    if results_nutrients:
+        st.write(results_nutrients[0]['nutrientName'])
+        st.write(results_nutrients)
     # ingredients_dict = {
     #     results_nutrients['nutrientName'] : {
     #         'value' : results_nutrients['value'],
@@ -99,10 +100,13 @@ with ingredients_search:
 # dict_nutrients = []
 # ingredients = {'foodname':[], 'nutrients':[]}
 
-mylist_ingredients = []
+if not 'mylist_ingredients' in st.session_state:
+    st.session_state.mylist_ingredients = []
+# mylist_ingredients = []
 
 if button_addtolist:
-    mylist_ingredients.append(results_name)
+    st.session_state.mylist_ingredients.append(results_name)
+    # mylist_ingredients.append(results_name)
     # ingredients['nutrients'].append(results_nutrients)
     # ingredient_new = {results_name: results_df}
     # ingredients = ingredients.append(ingredient_new)
@@ -113,7 +117,7 @@ if button_addtolist:
 with ingredients_list:
     st.subheader('My Ingredients List:')
     mylist_bullets = ''
-    for i in mylist_ingredients:
+    for i in st.session_state.mylist_ingredients:
         mylist_bullets += '- ' + i + '\n'
     st.markdown(mylist_bullets)
 
