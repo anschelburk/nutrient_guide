@@ -115,6 +115,7 @@ if __name__ == '__main__':
     st.set_page_config(layout='wide')
 
     initialized_data = initialize_once()
+    # initialized_data = {'initialized': False}
     # initialized_data['initialized'] currently == False
     # Put anything below that just needs to happen once.
     breakpoint()
