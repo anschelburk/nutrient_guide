@@ -7,21 +7,6 @@ from daily_values import daily_values as dv, dailyvalues_blank as dv_blank
     
 st.set_page_config(layout='wide')
 
-st.session_state['DEMO_KEY'] = os.getenv('DEMO_KEY', "") # <-- change to 'search_key'
-st.session_state['search_endpoint'] = 'https://api.nal.usda.gov/fdc/v1/foods/search'
-st.session_state['dailyvalues_full'] = dv
-st.session_state['dailyvalues_blank'] = dv_blank
-
-if not 'mylist_ingredients' in st.session_state:
-    st.session_state['mylist_ingredients'] = []
-if not 'mylist_nutrients' in st.session_state:
-    st.session_state['mylist_nutrients'] = {}
-if not 'results_name' in st.session_state:
-    st.session_state['results_name'] = ''
-if not 'results_nutrients' in st.session_state:
-    st.session_state['results_nutrients'] = ''
-
-
 def add_daily_value_dicts(dict1: dict, dict2: dict): # <-- not used yet
     final_added_dict = {}
     for key in dict1:
@@ -49,20 +34,30 @@ def draw_table_daily_values(data_source: dict):
             .rename(columns={'value': 'Amount', 'unit': 'Units'})
         )
 
-def draw_table_json_data(data_source):
-    results_df = pd.DataFrame(
-        data=data_source,
-        columns=['nutrientName', 'value', 'unitName']
-        )
-    results_df = results_df.rename(
-        columns={
-            'nutrientName': 'Nutrient Name',
-            'value': 'Amount',
-            'unitName': 'Units'
-            }
-        )
-    results_df.index = range(1, len(results_df)+1)
-    st.write(results_df)
+def draw_table_json_data(json_data):
+    st.session_state['filtered_json_data'] = []
+    for item in json_data:
+        # filtered_item = {'nutrientName', 'value': item['value'], 'unit': item['unitName']}
+        filtered_item = {'nutrientName': item['nutrientName'], 'value': item['value'], 'unit': item['unitName']}
+        st.session_state['filtered_json_data'].append(filtered_item)
+    # st.write(
+    #     pd.DataFrame
+    #         .from_dict(st.session_state['filtered_json_data'], orient='index')
+    #         .rename(columns={'value': 'Amount', 'unit': 'Units'})
+    # )
+    st.write(pd.DataFrame(st.session_state['filtered_json_data'])
+             .rename(
+                 columns={
+                     'nutrientName': 'Nutrient',
+                     'value': 'Amount',
+                     'unit': 'Units'
+                 }
+             ))
+            #  .style.hide(axis='index'))
+            #  .to_string(index=False))
+
+def format_daily_values_dict(dailyvalues_dict: dict):
+    st.session_state['formatted_daily_values_dict'] = {key: {"nutrient": value} for key, value in dailyvalues_dict.items()}
 
 def get_search_results_data(searchbar_input):
         return(requests.get(
@@ -118,6 +113,22 @@ def update_search_results_nutrients(searchbar_input):
     # return(results_nutrients)
 
 if __name__ == '__main__':
+
+    st.session_state['DEMO_KEY'] = os.getenv('DEMO_KEY', "") # <-- change to 'search_key'
+    st.session_state['search_endpoint'] = 'https://api.nal.usda.gov/fdc/v1/foods/search'
+    st.session_state['dailyvalues_full'] = dv
+    st.session_state['dailyvalues_blank'] = dv_blank
+
+    if not 'formatted_daily_values_dict_full' in st.session_state:
+        st.session_state['formatted_daily_values_dict_full'] = format_daily_values_dict(dv)
+    if not 'mylist_ingredients' in st.session_state:
+        st.session_state['mylist_ingredients'] = []
+    if not 'mylist_nutrients' in st.session_state:
+        st.session_state['mylist_nutrients'] = {}
+    if not 'results_name' in st.session_state:
+        st.session_state['results_name'] = ''
+    if not 'results_nutrients' in st.session_state:
+        st.session_state['results_nutrients'] = ''
 
     # print('this prints just after the __main__ statement')
 
@@ -179,7 +190,6 @@ if __name__ == '__main__':
         st.subheader('Nutrients I Have')
         nutrients_i_have_dict = st.session_state['dailyvalues_blank']
         draw_table_daily_values(nutrients_i_have_dict)
-        breakpoint()
 
     with nutrients_i_need:
         st.subheader('Nutrients I Need')
