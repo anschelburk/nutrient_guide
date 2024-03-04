@@ -127,7 +127,7 @@ if __name__ == '__main__':
     # print('Just after st.session_state['mylist_ingredients']')
     # print(f'st.session_state['mylist_ingredients'] = {st.session_state['mylist_ingredients']}')
 
-    st.title('Nutrition Guide')
+    st.title('Nutrient Guide')
 
     (search_an_ingredient,
         my_ingredients_list,
@@ -179,6 +179,7 @@ if __name__ == '__main__':
         st.subheader('Nutrients I Have')
         nutrients_i_have_dict = st.session_state['dailyvalues_blank']
         draw_table_daily_values(nutrients_i_have_dict)
+        breakpoint()
 
     with nutrients_i_need:
         st.subheader('Nutrients I Need')
