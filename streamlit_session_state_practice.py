@@ -10,10 +10,6 @@ st.set_page_config(layout="wide")
 st.title('Nutrition Guide')
 ingredients_search, ingredients_list, nutrients_have, nutrients_need = st.columns((3, 2, 2, 2))
 
-# map_data = pd.DataFrame(
-#     np.random.randn(1000,2) / [50,50] + [37.76, -122.4],
-#     columns=['lat', 'lon'])
-
 search_endpoint = 'https://api.nal.usda.gov/fdc/v1/foods/search'
 DEMO_KEY = os.getenv('DEMO_KEY', "")
 mylist_ingredients = []
@@ -89,44 +85,6 @@ def button_addtolist(results_name):
 
 
 with ingredients_search:
-<<<<<<< HEAD
-    if results_name:
-        st.subheader(f'Showing results for: {results_name}')
-        button_addtolist = st.button('Add to My Ingredients List', on_click=button_addtolist(results_name))
-        _button_remove = st.button('Remove from My Ingredients List', on_click=button_remove())
-        st.write(results_df)
-        ingredients_filtered = {}
-        # for key in results_nutrients:
-        #     ingredients_filtered[results_nutrients][key]['nutrientName'] = {
-        #         'value' : results_nutrients[key]['value'],
-        #         'unit' : results_nutrients[key]['unitName']
-        #     }
-        # for key in results_nutrients:
-        #     ingredients_filtered.update(
-        #         results_nutrients[key]['nutrientName'] : {
-        #                 'value' : results_nutrients[key]['value'],
-        #                 'unit' : results_nutrients[key]['unitName']
-        #          }
-        #     )
-
-        if results_nutrients:
-            st.write(results_nutrients[0]['nutrientName'])
-            st.write(results_nutrients)
-            # ingredients_dict = {
-            #     results_nutrients['nutrientName'] : {
-            #         'value' : results_nutrients['value'],
-            #         'unit' : results_nutrients['unitName']
-            #     }
-            # }
-
-# st.map(map_data)
-# print(button_remove)
-
-print("Hello, my name is Anschel")
-
-def no_access():
-    print("You have no access to this function")
-=======
     st.subheader(f'Showing results for: {results_name}')
     button_addtolist = st.button('Add to My Ingredients List')
     button_remove = st.button('Remove from My Ingredients List')
@@ -153,7 +111,6 @@ def no_access():
     #         'unit' : results_nutrients['unitName']
     #     }
     # }
->>>>>>> 6cb92e3c34dea6c32082cf0dec5dbcd9e848b3c0
 
 # ingredients_search.subheader(f'Showing results for: {results_name}')
 # button_addtolist = ingredients_search.button('Add to My Ingredients List')
@@ -168,12 +125,6 @@ def no_access():
 # dict_nutrients = []
 # ingredients = {'foodname':[], 'nutrients':[]}
 
-<<<<<<< HEAD
-
-# if button_addtolist:
-#     mylist_ingredients.append(results_name)
-#     breakpoint()
-=======
 if not 'mylist_ingredients' in st.session_state:
     st.session_state.mylist_ingredients = []
 # mylist_ingredients = []
@@ -181,7 +132,6 @@ if not 'mylist_ingredients' in st.session_state:
 if button_addtolist:
     st.session_state.mylist_ingredients.append(results_name)
     # mylist_ingredients.append(results_name)
->>>>>>> 6cb92e3c34dea6c32082cf0dec5dbcd9e848b3c0
     # ingredients['nutrients'].append(results_nutrients)
     # ingredient_new = {results_name: results_df}
     # ingredients = ingredients.append(ingredient_new)
