@@ -16,6 +16,10 @@ if not 'mylist_ingredients' in st.session_state:
     st.session_state['mylist_ingredients'] = []
 if not 'mylist_nutrients' in st.session_state:
     st.session_state['mylist_nutrients'] = {}
+if not 'results_name' in st.session_state:
+    st.session_state['results_name'] = ''
+if not 'results_nutrients' in st.session_state:
+    st.session_state['results_nutrients'] = ''
 
 
 def add_daily_value_dicts(dict1: dict, dict2: dict): # <-- not used yet
@@ -71,22 +75,6 @@ def get_search_results_data(searchbar_input):
     #     )
     # return(results)
 
-def get_search_results_name(searchbar_input):
-    return(
-        get_search_results_data(searchbar_input).json().get('foods')[0].get('description')
-    )
-    # results = get_search_results_data(searchbar_input)
-    # results_name = results.json().get('foods')[0].get('description')
-    # return(results_name)
-
-def get_search_results_nutrients(searchbar_input):
-    return(
-        get_search_results_data(searchbar_input).json().get('foods')[0].get('foodNutrients')
-    )
-    # results = get_search_results_data(searchbar_input)
-    # results_nutrients = results.json().get('foods')[0].get('foodNutrients')
-    # return(results_nutrients)
-
 # def initialize_once(): # <-- alphabetize
 #     return {'initialized': False}
 
@@ -111,6 +99,24 @@ def subtract_daily_value_dicts(dict1: dict, dict2: dict):
             }    
     return(final_subtracted_dict)
 
+def update_search_results_name(searchbar_input):
+    st.session_state['results_name'] = get_search_results_data(searchbar_input).json().get('foods')[0].get('description')
+    # return(
+    #     get_search_results_data(searchbar_input).json().get('foods')[0].get('description')
+    # )
+    # results = get_search_results_data(searchbar_input)
+    # results_name = results.json().get('foods')[0].get('description')
+    # return(results_name)
+
+def update_search_results_nutrients(searchbar_input):
+    st.session_state['results_nutrients'] = get_search_results_data(searchbar_input).json().get('foods')[0].get('foodNutrients')
+    # return(
+        # get_search_results_data(searchbar_input).json().get('foods')[0].get('foodNutrients')
+    # )
+    # results = get_search_results_data(searchbar_input)
+    # results_nutrients = results.json().get('foods')[0].get('foodNutrients')
+    # return(results_nutrients)
+
 if __name__ == '__main__':
 
     # print('this prints just after the __main__ statement')
@@ -134,26 +140,31 @@ if __name__ == '__main__':
             'Start by typing a food or ingredient below, and then press ENTER.'
         )
         if st.session_state['search']:
-            st.write('Showing results for:' + get_search_results_name(st.session_state['search']))
+            # st.session_state['search'] = search
+            # st.write('Showing results for:' + get_search_results_name(st.session_state['search']))
+            update_search_results_name(st.session_state['search'])
+            update_search_results_nutrients(st.session_state['search'])
+            st.write('Showing results for:', st.session_state['results_name'])
+            # st.write('Showing results for:' + get_search_results_name(st.session_state['search']))
             
             # print('Just before add button')
             # print(f'st.session_state['mylist_ingredients'] = {st.session_state['mylist_ingredients']}')
             button_add_to_list(
-                get_search_results_name(st.session_state['search']),
+                st.session_state['results_name'],
                 st.session_state['mylist_ingredients']
-            )
+                )
             # print('Just after add button')
             # print(f'st.session_state['mylist_ingredients'] = {st.session_state['mylist_ingredients']}')
             # print('Just before remove button')
             # print(f'st.session_state['mylist_ingredients'] = {st.session_state['mylist_ingredients']}')
             button_remove_from_list(
-                get_search_results_name(st.session_state['search']),
+                st.session_state['results_name'],
                 st.session_state['mylist_ingredients']
-            )
+                )
             # print('Just after remove button.')
             # print(f'st.session_state['mylist_ingredients'] = {st.session_state['mylist_ingredients']}')
             draw_table_json_data(
-                get_search_results_nutrients(st.session_state['search'])
+                st.session_state['results_nutrients']
             )
             
         else:
