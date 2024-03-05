@@ -7,7 +7,7 @@ from daily_values import daily_values as dv, dailyvalues_blank as dv_blank
     
 st.set_page_config(layout='wide')
 
-def add_daily_value_dicts(dict1: dict, dict2: dict): # <-- not used yet
+def add_daily_value_dicts(dict1: dict, dict2: dict): # <-- Not used yet
     final_added_dict = {}
     for key in dict1:
         if key in dict2:
