@@ -7,16 +7,6 @@ from daily_values import daily_values as dv, dailyvalues_blank as dv_blank
     
 st.set_page_config(layout='wide')
 
-def add_daily_value_dicts(dict1: dict, dict2: dict): # <-- Not used yet
-    final_added_dict = {}
-    for key in dict1:
-        if key in dict2:
-            final_added_dict[key] = {
-                'value' : dict1[key]['value'] - dict2[key]['value'],
-                'unit' : dict1[key]['unit']
-            }    
-    return(final_added_dict)
-
 def button_add_to_list(item_name, list_name):
     st_button_add_to_list = st.button('Add Ingredient to My List')
     if st_button_add_to_list:
@@ -64,6 +54,31 @@ def get_search_results_data(searchbar_input):
             st.session_state['search_endpoint'],
             params={"query": searchbar_input, "api_key": st.session_state['DEMO_KEY']}
         ))
+
+def merge_dicts_add(dict1: dict, dict2: dict): # <-- Not used yet
+    """
+    Adds the values of dict2 to dict1. dict2.values() --> dict1.values().
+    """
+    final_added_dict = {}
+    for key in dict2:
+        if key in dict1.keys():
+            dict1[key]['value'] += dict2[key]['value']
+        else:
+            dict1[key] = dict2[key]    
+    return(final_added_dict)
+
+def merge_dicts_subtract(dict1: dict, dict2: dict): # <-- Not used yet
+    """
+    Subtracts the values of dict2 from dict1. dict2.values() --> dict1.values().
+    """
+    final_added_dict = {}
+    for key in dict2.keys():
+        if key in dict1:
+            dict1[key]['value'] -= dict2[key]['value']
+        else:
+            dict1[key] = dict2[key]    
+    return(final_added_dict)
+
     # results = requests.get(
     #     st.session_state.['search_endpoint'],
     #     params={"query" : searchbar_input, "api_key" : st.session_state.['DEMO_KEY']}
