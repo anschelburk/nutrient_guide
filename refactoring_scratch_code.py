@@ -38,6 +38,12 @@ def button_add_to_list(
                 st.session_state['results_nutrients']
             )
         )
+        merge_dicts_subtract(
+            st.session_state['nutrients_i_need_dict'],
+            format_json_data_as_dict(
+                st.session_state['results_nutrients']
+            )
+        )
 
 def button_remove_from_list(
         results_name = st.session_state['results_name'],
@@ -47,6 +53,12 @@ def button_remove_from_list(
     if st_button:
         mylist_ingredients.remove(results_name)
         merge_dicts_subtract(
+            st.session_state['nutrients_i_have_dict'],
+            format_json_data_as_dict(
+                st.session_state['results_nutrients']
+            )
+        )
+        merge_dicts_add(
             st.session_state['nutrients_i_need_dict'],
             format_json_data_as_dict(
                 st.session_state['results_nutrients']
@@ -85,36 +97,51 @@ def get_search_results_data(searchbar_input):
             params={"query": searchbar_input, "api_key": st.session_state['DEMO_KEY']}
         ))
 
-def merge_dicts_add(current_nutrients: dict, new_nutrients: dict): # <-- Not used yet
+def merge_dicts_add(current_nutrients: dict, new_nutrients: dict):
     """
     Adds the values of new_nutrients to current_nutrients. Returns a modified
-    version of my_current_nutrients.
+    version of current_nutrients.
     """
     for key in new_nutrients:
         if key in current_nutrients.keys():
             current_nutrients[key]['value'] += new_nutrients[key]['value']
         else:
-            current_nutrients[key] = new_nutrients[key]    
-    return(current_nutrients)
+            if ',' in key:
+                if key.split(',')[0] in current_nutrients.keys():
+                    current_nutrients[key.split(',')[0]]['value'] += new_nutrients[key]['value']
+                else:
+                    current_nutrients[key] = new_nutrients[key] 
+            else:
+                current_nutrients[key] = new_nutrients[key] 
+    return current_nutrients
 
-def merge_dicts_subtract(dict1: dict, dict2: dict): # <-- Not used yet
+def merge_dicts_subtract(current_nutrients: dict, new_nutrients: dict):
     """
-    Subtracts the values of dict2 from dict1. dict2.values() --> dict1.values().
-    Returns a modified version of dict1.
+    Subtracts the values of new_nutrients from current_nutrients. Returns a modified
+    version of current_nutrients.
     """
-    final_added_dict = {}
-    for key in dict2.keys():
-        if key in dict1:
-            dict1[key]['value'] -= dict2[key]['value']
+    for key in new_nutrients:
+        if key in current_nutrients.keys():
+            current_nutrients[key]['value'] -= new_nutrients[key]['value']
         else:
-            dict1[key] = dict2[key]    
-    return(final_added_dict)
+            if ',' in key:
+                if key.split(',')[0] in current_nutrients.keys():
+                    current_nutrients[key.split(',')[0]]['value'] -= new_nutrients[key]['value']
+                else:
+                    current_nutrients[key] = new_nutrients[key] 
+            else:
+                current_nutrients[key] = new_nutrients[key] 
+    return current_nutrients
 
-def print_list_as_bullets(list_name: list):
-    mylist_bullets = ''
-    for item in list_name:
-        mylist_bullets += '- ' + item + '\n'
-    st.markdown(mylist_bullets)
+def print_my_nutrients_list_as_bullets(list_name: list):
+    for item in range(0, len(list_name)):
+        dropdown_list = st.selectbox(
+            list_name[item],
+            list(range(0, 11)),
+            index = 1,
+            key = list_name[item]
+        )
+        st.write(dropdown_list, '\n')
 
 def subtract_daily_value_dicts(dict1: dict, dict2: dict):
     final_subtracted_dict = {}
@@ -163,7 +190,9 @@ if __name__ == '__main__':
 
     with my_ingredients_list:
         st.subheader('My Ingredients List')
-        print_list_as_bullets(st.session_state['mylist_ingredients'])
+        print_my_nutrients_list_as_bullets(
+            st.session_state['mylist_ingredients']
+        )
 
     with nutrients_i_have:
         st.subheader('Nutrients I Have')
