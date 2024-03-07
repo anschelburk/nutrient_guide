@@ -103,12 +103,13 @@ def merge_dicts_add(current_nutrients: dict, new_nutrients: dict):
     version of current_nutrients.
     """
     for key in new_nutrients:
+        stripped_key = key.split(',')[0]
         if key in current_nutrients.keys():
             current_nutrients[key]['value'] += new_nutrients[key]['value']
         else:
             if ',' in key:
-                if key.split(',')[0] in current_nutrients.keys():
-                    current_nutrients[key.split(',')[0]]['value'] += new_nutrients[key]['value']
+                if stripped_key in current_nutrients.keys():
+                    current_nutrients[stripped_key]['value'] += new_nutrients[key]['value']
                 else:
                     current_nutrients[key] = new_nutrients[key] 
             else:
@@ -121,12 +122,13 @@ def merge_dicts_subtract(current_nutrients: dict, new_nutrients: dict):
     version of current_nutrients.
     """
     for key in new_nutrients:
+        stripped_key = key.split(',')[0]
         if key in current_nutrients.keys():
             current_nutrients[key]['value'] -= new_nutrients[key]['value']
         else:
             if ',' in key:
-                if key.split(',')[0] in current_nutrients.keys():
-                    current_nutrients[key.split(',')[0]]['value'] -= new_nutrients[key]['value']
+                if stripped_key in current_nutrients.keys():
+                    current_nutrients[stripped_key]['value'] -= new_nutrients[key]['value']
                 else:
                     current_nutrients[key] = new_nutrients[key] 
             else:
