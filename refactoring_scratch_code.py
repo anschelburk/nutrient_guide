@@ -5,6 +5,8 @@ import streamlit as st
 
 from daily_values import daily_values as dv, dailyvalues_blank as dv_blank
     
+# First commit on branch purify_functions
+
 st.set_page_config(layout='wide')
 
 st.session_state['DEMO_KEY'] = os.getenv('DEMO_KEY', "") # <-- change to 'search_key'
