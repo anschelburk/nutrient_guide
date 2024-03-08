@@ -64,7 +64,7 @@ def button_remove_from_list(
         current_nutrients_i_have_data: dict,
         current_nutrients_i_need_data: dict
     ):
-    st_button = st.button('Add Ingredient to My List')
+    st_button = st.button('Remove Ingredient from My List')
     if st_button:
         if api_ingredient_name in cached_ingredients_dict.keys():
             merge_dicts_add(
