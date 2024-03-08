@@ -114,15 +114,18 @@ def merge_dicts_subtract(current_nutrients: dict, new_nutrients: dict):
                 current_nutrients[key] = new_nutrients[key] 
     return current_nutrients
 
-def print_my_nutrients_list_as_bullets(list_name: list):
-    for item in range(0, len(list_name)):
-        dropdown_list = st.selectbox(
-            list_name[item],
+def print_my_nutrients_list_with_dropdown_lists(
+        list_of_my_nutrients: list
+):
+    for item in list_of_my_nutrients:
+        st.write(item)
+        st.selectbox(
+            'Please select how many of this food item you would like:',
             list(range(0, 11)),
             index = 1,
-            key = list_name[item]
+            key = item
         )
-        st.write(dropdown_list, '\n')
+        st.write('\n')
 
 def update_search_results_name_and_nutrients(
         searchbar_input: str,
@@ -184,7 +187,7 @@ if __name__ == '__main__':
 
     with my_ingredients_list:
         st.subheader('My Ingredients List')
-        print_my_nutrients_list_as_bullets(
+        print_my_nutrients_list_with_dropdown_lists(
             st.session_state['mylist_ingredients']
         )
 
