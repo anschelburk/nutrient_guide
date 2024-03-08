@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 from daily_values import daily_values as dv, dailyvalues_blank as dv_blank
-    
+
 st.set_page_config(layout='wide')
 
 st.session_state['DEMO_KEY'] = os.getenv('DEMO_KEY', "") # <-- change to 'search_key'
@@ -78,23 +78,29 @@ def format_json_data_as_dict(json_data_to_format):
         }
     return(json_data_formatted)
 
+def _normalize_nutrient_names(current_nutrients: dict, new_nutrients: dict):
+    current_nutrients = {
+        key.split(', ')[0]: value for key, value in current_nutrients.items()
+    }
+    new_nutrients = {
+        key.split(', ')[0]: value for key, value in new_nutrients.items()
+    }
+    return current_nutrients, new_nutrients
+
 def merge_dicts_add(current_nutrients: dict, new_nutrients: dict):
     """
     Adds the values of new_nutrients to current_nutrients. Returns a modified
     version of current_nutrients.
     """
+    current_nutrients, new_nutrients = _normalize_nutrient_names(
+        current_nutrients, new_nutrients
+    )
+
     for key in new_nutrients:
-        stripped_key = key.split(',')[0]
         if key in current_nutrients.keys():
             current_nutrients[key]['value'] += new_nutrients[key]['value']
         else:
-            if ',' in key:
-                if stripped_key in current_nutrients.keys():
-                    current_nutrients[stripped_key]['value'] += new_nutrients[key]['value']
-                else:
-                    current_nutrients[key] = new_nutrients[key] 
-            else:
-                current_nutrients[key] = new_nutrients[key] 
+            current_nutrients[key] = new_nutrients[key]
     return current_nutrients
 
 def merge_dicts_subtract(current_nutrients: dict, new_nutrients: dict):
@@ -111,9 +117,9 @@ def merge_dicts_subtract(current_nutrients: dict, new_nutrients: dict):
                 if stripped_key in current_nutrients.keys():
                     current_nutrients[stripped_key]['value'] -= new_nutrients[key]['value']
                 else:
-                    current_nutrients[key] = new_nutrients[key] 
+                    current_nutrients[key] = new_nutrients[key]
             else:
-                current_nutrients[key] = new_nutrients[key] 
+                current_nutrients[key] = new_nutrients[key]
     return current_nutrients
 
 def print_my_nutrients_list_with_dropdown_lists(list_of_my_nutrients: list):
