@@ -5,8 +5,6 @@ import streamlit as st
 
 from daily_values import daily_values as dv, dailyvalues_blank as dv_blank
     
-# First commit on branch purify_functions
-
 st.set_page_config(layout='wide')
 
 st.session_state['DEMO_KEY'] = os.getenv('DEMO_KEY', "") # <-- change to 'search_key'
@@ -28,44 +26,30 @@ if not 'results_nutrients' in st.session_state:
     st.session_state['results_nutrients'] = ''
 
 def button_add_to_list(
-        results_name = st.session_state['results_name'],
-        mylist_ingredients = st.session_state['mylist_ingredients']
+        search_result_name: str,
+        list_of_ingredients: list,
+        current_nutrients_i_have_data: dict,
+        current_nutrients_i_need_data: dict,
+        new_nutrients_data: dict
 ):
     st_button = st.button('Add Ingredient to My List')
     if st_button:
-        mylist_ingredients.append(results_name)
-        merge_dicts_add(
-            st.session_state['nutrients_i_have_dict'],
-            format_json_data_as_dict(
-                st.session_state['results_nutrients']
-            )
-        )
-        merge_dicts_subtract(
-            st.session_state['nutrients_i_need_dict'],
-            format_json_data_as_dict(
-                st.session_state['results_nutrients']
-            )
-        )
+        list_of_ingredients.append(search_result_name)
+        merge_dicts_add(current_nutrients_i_have_data, new_nutrients_data)
+        merge_dicts_subtract(current_nutrients_i_need_data, new_nutrients_data)
 
 def button_remove_from_list(
-        results_name = st.session_state['results_name'],
-        mylist_ingredients = st.session_state['mylist_ingredients']
+        search_result_name: str,
+        list_of_ingredients: list,
+        current_nutrients_i_have_data: dict,
+        current_nutrients_i_need_data: dict,
+        new_nutrients_data: dict
 ):
     st_button = st.button('Remove Ingredient from My List')
     if st_button:
-        mylist_ingredients.remove(results_name)
-        merge_dicts_subtract(
-            st.session_state['nutrients_i_have_dict'],
-            format_json_data_as_dict(
-                st.session_state['results_nutrients']
-            )
-        )
-        merge_dicts_add(
-            st.session_state['nutrients_i_need_dict'],
-            format_json_data_as_dict(
-                st.session_state['results_nutrients']
-            )
-        )
+        list_of_ingredients.remove(search_result_name)
+        merge_dicts_subtract(current_nutrients_i_have_data, new_nutrients_data)
+        merge_dicts_add(current_nutrients_i_need_data, new_nutrients_data)
 
 def draw_table_daily_values(data_source: dict):
     st.write(
@@ -74,16 +58,15 @@ def draw_table_daily_values(data_source: dict):
             .rename(columns={'value': 'Amount', 'unit': 'Units'})
         )
 
-def format_daily_values_dict(dailyvalues_dict: dict):
-    st.session_state['formatted_daily_values_dict'] = {key: {"nutrient": value} for key, value in dailyvalues_dict.items()}
-
-def format_json_data_as_dict(data):
+def format_json_data_as_dict(json_data_to_format):
     """
-    Formats json data retrieved from API by returning new dict from the json
-    data that matches the format of the dicts imported from daily_values.py
+    Creates and then returns a new dict, json_data_formatted, that contains
+    only the needed values from the json data retrieved by the API search,
+    and is formatted to match the dicts displayed in the 'Nutrients I Have' and
+    'Nutrients I Need' columns.
     """
     json_data_formatted = {}
-    for item in data:
+    for item in json_data_to_format:
         nutrient_name_json = item['nutrientName']
         nutrient_amount_json = item['value']
         nutrient_unit_json = item['unitName']
@@ -92,12 +75,6 @@ def format_json_data_as_dict(data):
             'unit': nutrient_unit_json
         }
     return(json_data_formatted)
-
-def get_search_results_data(searchbar_input):
-        return(requests.get(
-            st.session_state['search_endpoint'],
-            params={"query": searchbar_input, "api_key": st.session_state['DEMO_KEY']}
-        ))
 
 def merge_dicts_add(current_nutrients: dict, new_nutrients: dict):
     """
@@ -147,21 +124,19 @@ def print_my_nutrients_list_as_bullets(list_name: list):
         )
         st.write(dropdown_list, '\n')
 
-def subtract_daily_value_dicts(dict1: dict, dict2: dict):
-    final_subtracted_dict = {}
-    for key in dict1:
-        if key in dict2:
-            final_subtracted_dict[key] = {
-                'value' : dict1[key]['value'] - dict2[key]['value'],
-                'unit' : dict1[key]['unit']
-            }    
-    return(final_subtracted_dict)
-
-def update_search_results_name(searchbar_input):
-    st.session_state['results_name'] = get_search_results_data(searchbar_input).json().get('foods')[0].get('description')
-
-def update_search_results_nutrients(searchbar_input):
-    st.session_state['results_nutrients'] = get_search_results_data(searchbar_input).json().get('foods')[0].get('foodNutrients')
+def update_search_results_name_and_nutrients(
+        searchbar_input: str,
+        api_search_endpoint,
+        api_search_key,
+        results_name_to_update,
+        results_nutrients_to_update
+):
+    api_search_result = requests.get(
+        api_search_endpoint,
+        params={"query": searchbar_input, "api_key": api_search_key}
+    ).json().get('foods')[0]
+    results_name_to_update = api_search_result.get('description')
+    results_nutrients_to_update = api_search_result.get('foodNutrients')
 
 if __name__ == '__main__':
 
@@ -178,11 +153,28 @@ if __name__ == '__main__':
             'Start by typing a food or ingredient below, and then press ENTER.'
         )
         if st.session_state['search']:
-            update_search_results_name(st.session_state['search'])
-            update_search_results_nutrients(st.session_state['search'])
+            update_search_results_name_and_nutrients(
+                st.session_state['search'],
+                st.session_state['search_endpoint'],
+                st.session_state['DEMO_KEY'],
+                st.session_state['results_name'],
+                st.session_state['results_nutrients']
+            )
             st.write('Showing results for:', st.session_state['results_name'])
-            button_add_to_list()
-            button_remove_from_list()
+            button_add_to_list(
+                st.session_state['results_name'],
+                st.session_state['mylist_ingredients'],
+                st.session_state['nutrients_i_have_dict'],
+                st.session_state['nutrients_i_need_dict'],
+                format_json_data_as_dict(st.session_state['results_nutrients'])
+            )
+            button_remove_from_list(
+                st.session_state['results_name'],
+                st.session_state['mylist_ingredients'],
+                st.session_state['nutrients_i_have_dict'],
+                st.session_state['nutrients_i_need_dict'],
+                format_json_data_as_dict(st.session_state['results_nutrients'])
+            )
             draw_table_daily_values(
                 format_json_data_as_dict(
                     st.session_state['results_nutrients']
