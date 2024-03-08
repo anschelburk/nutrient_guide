@@ -14,8 +14,8 @@ if not 'api_search_results_name' in st.session_state:
     st.session_state['api_search_results_name'] = ''
 if not 'api_search_results_nutrients' in st.session_state:
     st.session_state['api_search_results_nutrients'] = []
-if not 'mylist_ingredients' in st.session_state:
-    st.session_state['mylist_ingredients'] = []
+if not 'my_ingredients_list' in st.session_state:
+    st.session_state['my_ingredients_list'] = []
 if not 'mylist_nutrients' in st.session_state:
     st.session_state['mylist_nutrients'] = {}
 if not 'nutrients_i_have_dict' in st.session_state:
@@ -34,17 +34,43 @@ if not 'cached_ingredient_names_and_nutrients' in st.session_state:
 #     st.session_state['results_nutrients'] = []
 
 def button_add_to_list(
-        search_result_name: str,
-        list_of_ingredients: list,
+        cached_ingredients_dict: dict,
+        api_ingredient_name: str,
+        api_ingredient_nutrients,
         current_nutrients_i_have_data: dict,
-        current_nutrients_i_need_data: dict,
-        new_nutrients_data: dict
-):
+        current_nutrients_i_need_data: dict
+    ):
     st_button = st.button('Add Ingredient to My List')
     if st_button:
-        list_of_ingredients.append(search_result_name)
-        merge_dicts_add(current_nutrients_i_have_data, new_nutrients_data)
-        merge_dicts_subtract(current_nutrients_i_need_data, new_nutrients_data)
+        if not api_ingredient_name in cached_ingredients_dict.keys():
+            api_ingredient_nutrients = format_json_data_as_dict(
+                    api_ingredient_nutrients
+                )
+            cached_ingredients_dict[api_ingredient_name] = api_ingredient_nutrients
+            merge_dicts_add(
+                    current_nutrients_i_have_data,
+                    cached_ingredients_dict[api_ingredient_name]
+                )
+            merge_dicts_subtract(
+                    current_nutrients_i_need_data,
+                    cached_ingredients_dict[api_ingredient_name]
+                )
+        else:
+            pass
+
+# def button_add_to_list(
+#         search_result_name: str,
+#         list_of_ingredients: list,
+#         current_nutrients_i_have_data: dict,
+#         current_nutrients_i_need_data: dict,
+#         new_nutrients_data: dict
+# ):
+#     st_button = st.button('Add Ingredient to My List')
+#     if st_button:
+
+#         list_of_ingredients.append(search_result_name)
+#         merge_dicts_add(current_nutrients_i_have_data, new_nutrients_data)
+#         merge_dicts_subtract(current_nutrients_i_need_data, new_nutrients_data)
 
 def button_remove_from_list(
         search_result_name: str,
@@ -184,14 +210,19 @@ if __name__ == '__main__':
                 api_search_endpoint = SEARCH_ENDPOINT,
                 api_search_key = USDA_API_KEY
             )
-            st.write('Showing results for:', st.session_state['results_name'])
+            st.write('Showing results for:', st.session_state['api_search_results_name'])
             button_add_to_list(
-                st.session_state['results_name'],
-                st.session_state['mylist_ingredients'],
-                st.session_state['nutrients_i_have_dict'],
-                st.session_state['nutrients_i_need_dict'],
-                format_json_data_as_dict(st.session_state['results_nutrients'])
-            )
+                    cached_ingredients_dict = st.session_state[
+                        'cached_ingredient_names_and_nutrients'],
+                    api_ingredient_name = st.session_state[
+                        'api_search_results_name'],
+                    api_ingredient_nutrients = st.session_state[
+                        'api_search_results_nutrients'],
+                    current_nutrients_i_have_data = st.session_state[
+                        'nutrients_i_have_dict'],
+                    current_nutrients_i_need_data = st.session_state[
+                        'nutrients_i_need_dict']
+                )
             button_remove_from_list(
                 st.session_state['results_name'],
                 st.session_state['mylist_ingredients'],
