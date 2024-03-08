@@ -20,8 +20,8 @@ if not 'nutrients_i_have_dict' in st.session_state:
     }
 if not 'nutrients_i_need_dict' in st.session_state:
     st.session_state['nutrients_i_need_dict'] = recommended_daily_nutrients
-# if not 'results_name_and_nutrients' in st.session_state:   <-- For next step: refactoring again, combining results_name and
-#     st.session_state['results_name_and_nutrients'] = {}        results_nutrients into a single, larger dict.
+if not 'cached_ingredient_names_and_nutrients' in st.session_state:
+    st.session_state['cached_ingredient_names_and_nutrients'] = {}
 if not 'results_name' in st.session_state:
     st.session_state['results_name'] = ''
 if not 'results_nutrients' in st.session_state:
@@ -128,18 +128,35 @@ def print_my_nutrients_list_with_dropdown_lists(list_of_my_nutrients: list):
         )
         st.write('\n')
 
-def update_search_results_name_and_nutrients(
+def update_nutrients_cache_with_api_search_results(
         searchbar_input: str,
+        nutrients_cache_to_update: dict,
         api_search_endpoint,
         api_search_key
 ):
     api_search_result = requests.get(
-        api_search_endpoint,
-        params={"query": searchbar_input, "api_key": api_search_key}
-    ).json().get('foods')[0]
-    updated_results_name = api_search_result.get('description')
-    updated_results_nutrients = api_search_result.get('foodNutrients')
-    return(updated_results_name, updated_results_nutrients)
+            api_search_endpoint,
+            params={"query": searchbar_input, "api_key": api_search_key}
+        ).json().get('foods')[0]
+    ingredient_name_from_api_search = api_search_result.get('description')
+    nutrients_from_api_search = api_search_result.get('foodNutrients')
+    nutrients_cache_to_update[
+            ingredient_name_from_api_search
+        ] = nutrients_from_api_search
+
+
+# def update_search_results_name_and_nutrients(
+#         searchbar_input: str,
+#         api_search_endpoint,
+#         api_search_key
+# ):
+#     api_search_result = requests.get(
+#         api_search_endpoint,
+#         params={"query": searchbar_input, "api_key": api_search_key}
+#     ).json().get('foods')[0]
+#     updated_results_name = api_search_result.get('description')
+#     updated_results_nutrients = api_search_result.get('foodNutrients')
+#     return(updated_results_name, updated_results_nutrients)
 
 if __name__ == '__main__':
 
@@ -156,11 +173,13 @@ if __name__ == '__main__':
             'Start by typing a food or ingredient below, and then press ENTER.'
         )
         if st.session_state['search']:
-            (st.session_state['results_name'],
-             st.session_state['results_nutrients']) = update_search_results_name_and_nutrients(
-                st.session_state['search'],
-                SEARCH_ENDPOINT,
-                USDA_API_KEY
+            update_nutrients_cache_with_api_search_results(
+            # (st.session_state['results_name'],
+            #  st.session_state['results_nutrients']) = update_nutrients_cache_with_api_search_results(
+                searchbar_input = st.session_state['search'],
+                nutrients_cache_to_update = st.session_state['cached_ingredient_names_and_nutrients'],
+                api_search_endpoint = SEARCH_ENDPOINT,
+                api_search_key = USDA_API_KEY
             )
             st.write('Showing results for:', st.session_state['results_name'])
             button_add_to_list(
