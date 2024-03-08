@@ -127,16 +127,17 @@ def print_my_nutrients_list_as_bullets(list_name: list):
 def update_search_results_name_and_nutrients(
         searchbar_input: str,
         api_search_endpoint,
-        api_search_key,
-        results_name_to_update,
-        results_nutrients_to_update
+        api_search_key
+        # results_name_to_update,
+        # results_nutrients_to_update
 ):
     api_search_result = requests.get(
         api_search_endpoint,
         params={"query": searchbar_input, "api_key": api_search_key}
     ).json().get('foods')[0]
-    results_name_to_update = api_search_result.get('description')
+    results_name_to_update = api_search_result.get('description'),
     results_nutrients_to_update = api_search_result.get('foodNutrients')
+    return(results_name_to_update, results_nutrients_to_update)
 
 if __name__ == '__main__':
 
@@ -153,12 +154,11 @@ if __name__ == '__main__':
             'Start by typing a food or ingredient below, and then press ENTER.'
         )
         if st.session_state['search']:
-            update_search_results_name_and_nutrients(
+            (st.session_state['results_name'],
+             st.session_state['results_nutrients']) = update_search_results_name_and_nutrients(
                 st.session_state['search'],
                 st.session_state['search_endpoint'],
-                st.session_state['DEMO_KEY'],
-                st.session_state['results_name'],
-                st.session_state['results_nutrients']
+                st.session_state['DEMO_KEY']
             )
             st.write('Showing results for:', st.session_state['results_name'])
             button_add_to_list(
