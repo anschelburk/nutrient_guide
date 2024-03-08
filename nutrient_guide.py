@@ -201,7 +201,7 @@ if __name__ == '__main__':
             )
             draw_table_daily_values(
                 format_json_data_as_dict(
-                    st.session_state['results_nutrients']
+                    st.session_state['api_search_results_nutrients']
                 )
             )
 
