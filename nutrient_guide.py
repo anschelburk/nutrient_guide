@@ -62,21 +62,16 @@ def draw_table_daily_values(data_source: dict):
 
 def format_json_data_as_dict(json_data_to_format):
     """
-    Creates and then returns a new dict, json_data_formatted, that contains
+    Creates and then returns a new dict, formatted_json_data, that contains
     only the needed values from the json data retrieved by the API search,
-    and is formatted to match the dicts displayed in the 'Nutrients I Have' and
-    'Nutrients I Need' columns.
+    and is formatted to match the nutrients_i_have and nutrients_i_need dicts.
     """
-    json_data_formatted = {}
-    for item in json_data_to_format:
-        nutrient_name_json = item['nutrientName']
-        nutrient_amount_json = item['value']
-        nutrient_unit_json = item['unitName']
-        json_data_formatted[nutrient_name_json] = {
-            'value': nutrient_amount_json,
-            'unit': nutrient_unit_json
-        }
-    return(json_data_formatted)
+    formatted_json_data = {
+        key['nutrientName']: {
+            'value': key['value'], 'unit': key['unitName']
+            } for key in json_data_to_format
+    }
+    return formatted_json_data
 
 def _normalize_nutrient_names(current_nutrients: dict, new_nutrients: dict):
     current_nutrients = {
