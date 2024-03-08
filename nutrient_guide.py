@@ -14,10 +14,8 @@ if not 'api_search_results_name' in st.session_state:
     st.session_state['api_search_results_name'] = ''
 if not 'api_search_results_nutrients' in st.session_state:
     st.session_state['api_search_results_nutrients'] = []
-if not 'my_ingredients_list' in st.session_state:
-    st.session_state['my_ingredients_list'] = []
-if not 'mylist_nutrients' in st.session_state:
-    st.session_state['mylist_nutrients'] = {}
+if not 'cached_ingredient_names_and_nutrients' in st.session_state:
+    st.session_state['cached_ingredient_names_and_nutrients'] = {}
 if not 'nutrients_i_have_dict' in st.session_state:
     st.session_state['nutrients_i_have_dict'] = {
             key: {
@@ -26,12 +24,6 @@ if not 'nutrients_i_have_dict' in st.session_state:
         }
 if not 'nutrients_i_need_dict' in st.session_state:
     st.session_state['nutrients_i_need_dict'] = recommended_daily_nutrients
-if not 'cached_ingredient_names_and_nutrients' in st.session_state:
-    st.session_state['cached_ingredient_names_and_nutrients'] = {}
-# if not 'results_name' in st.session_state:
-#     st.session_state['results_name'] = ''
-# if not 'results_nutrients' in st.session_state:
-#     st.session_state['results_nutrients'] = []
 
 def button_add_to_list(
         cached_ingredients_dict: dict,
