@@ -58,20 +58,6 @@ def button_add_to_list(
         else:
             pass
 
-# def button_add_to_list(
-#         search_result_name: str,
-#         list_of_ingredients: list,
-#         current_nutrients_i_have_data: dict,
-#         current_nutrients_i_need_data: dict,
-#         new_nutrients_data: dict
-# ):
-#     st_button = st.button('Add Ingredient to My List')
-#     if st_button:
-
-#         list_of_ingredients.append(search_result_name)
-#         merge_dicts_add(current_nutrients_i_have_data, new_nutrients_data)
-#         merge_dicts_subtract(current_nutrients_i_need_data, new_nutrients_data)
-
 def button_remove_from_list(
         cached_ingredients_dict: dict,
         api_ingredient_name: str,
@@ -92,19 +78,6 @@ def button_remove_from_list(
             del cached_ingredients_dict[api_ingredient_name]
         else:
             pass
-
-# def button_remove_from_list(
-#         search_result_name: str,
-#         list_of_ingredients: list,
-#         current_nutrients_i_have_data: dict,
-#         current_nutrients_i_need_data: dict,
-#         new_nutrients_data: dict
-# ):
-#     st_button = st.button('Remove Ingredient from My List')
-#     if st_button:
-#         list_of_ingredients.remove(search_result_name)
-#         merge_dicts_subtract(current_nutrients_i_have_data, new_nutrients_data)
-#         merge_dicts_add(current_nutrients_i_need_data, new_nutrients_data)
 
 def draw_table_daily_values(data_source: dict):
     st.write(
@@ -254,13 +227,6 @@ if __name__ == '__main__':
                     current_nutrients_i_need_data = st.session_state[
                         'nutrients_i_need_dict']
                 )
-            # button_remove_from_list(
-            #     st.session_state['results_name'],
-            #     st.session_state['mylist_ingredients'],
-            #     st.session_state['nutrients_i_have_dict'],
-            #     st.session_state['nutrients_i_need_dict'],
-            #     format_json_data_as_dict(st.session_state['results_nutrients'])
-            # )
             draw_table_daily_values(
                 format_json_data_as_dict(
                     st.session_state['api_search_results_nutrients']
