@@ -128,16 +128,14 @@ def update_search_results_name_and_nutrients(
         searchbar_input: str,
         api_search_endpoint,
         api_search_key
-        # results_name_to_update,
-        # results_nutrients_to_update
 ):
     api_search_result = requests.get(
         api_search_endpoint,
         params={"query": searchbar_input, "api_key": api_search_key}
     ).json().get('foods')[0]
-    results_name_to_update = api_search_result.get('description'),
-    results_nutrients_to_update = api_search_result.get('foodNutrients')
-    return(results_name_to_update, results_nutrients_to_update)
+    updated_results_name = api_search_result.get('description'),
+    updated_results_nutrients = api_search_result.get('foodNutrients')
+    return(updated_results_name, updated_results_nutrients)
 
 if __name__ == '__main__':
 
