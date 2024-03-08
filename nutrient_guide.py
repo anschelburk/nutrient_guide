@@ -3,23 +3,23 @@ import pandas as pd
 import requests
 import streamlit as st
 
-from daily_values import daily_values as dv, dailyvalues_blank as dv_blank
+from recommended_daily_nutrients import recommended_daily_nutrients
 
 st.set_page_config(layout='wide')
 
-st.session_state['DEMO_KEY'] = os.getenv('DEMO_KEY', "") # <-- change to 'search_key'
-st.session_state['search_endpoint'] = 'https://api.nal.usda.gov/fdc/v1/foods/search'
-st.session_state['dailyvalues_full'] = dv
-st.session_state['dailyvalues_blank'] = dv_blank
+USDA_API_KEY = os.getenv('DEMO_KEY', "")
+SEARCH_ENDPOINT = 'https://api.nal.usda.gov/fdc/v1/foods/search'
 
 if not 'mylist_ingredients' in st.session_state:
     st.session_state['mylist_ingredients'] = []
 if not 'mylist_nutrients' in st.session_state:
     st.session_state['mylist_nutrients'] = {}
 if not 'nutrients_i_have_dict' in st.session_state:
-    st.session_state['nutrients_i_have_dict'] = st.session_state['dailyvalues_blank']
+    st.session_state['nutrients_i_have_dict'] = {
+        key: {'value': 0, 'unit': value['unit']} for key, value in recommended_daily_nutrients.items()
+    }
 if not 'nutrients_i_need_dict' in st.session_state:
-    st.session_state['nutrients_i_need_dict'] = st.session_state['dailyvalues_full']
+    st.session_state['nutrients_i_need_dict'] = recommended_daily_nutrients
 # if not 'results_name_and_nutrients' in st.session_state:   <-- For next step: refactoring again, combining results_name and
 #     st.session_state['results_name_and_nutrients'] = {}        results_nutrients into a single, larger dict.
 if not 'results_name' in st.session_state:
@@ -164,8 +164,8 @@ if __name__ == '__main__':
             (st.session_state['results_name'],
              st.session_state['results_nutrients']) = update_search_results_name_and_nutrients(
                 st.session_state['search'],
-                st.session_state['search_endpoint'],
-                st.session_state['DEMO_KEY']
+                SEARCH_ENDPOINT,
+                USDA_API_KEY
             )
             st.write('Showing results for:', st.session_state['results_name'])
             button_add_to_list(
