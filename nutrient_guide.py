@@ -23,7 +23,7 @@ if not 'nutrients_i_need_dict' in st.session_state:
 if not 'results_name' in st.session_state:
     st.session_state['results_name'] = ''
 if not 'results_nutrients' in st.session_state:
-    st.session_state['results_nutrients'] = ''
+    st.session_state['results_nutrients'] = []
 
 def button_add_to_list(
         search_result_name: str,
@@ -114,9 +114,7 @@ def merge_dicts_subtract(current_nutrients: dict, new_nutrients: dict):
                 current_nutrients[key] = new_nutrients[key] 
     return current_nutrients
 
-def print_my_nutrients_list_with_dropdown_lists(
-        list_of_my_nutrients: list
-):
+def print_my_nutrients_list_with_dropdown_lists(list_of_my_nutrients: list):
     for item in list_of_my_nutrients:
         st.write(item)
         st.selectbox(
@@ -136,7 +134,7 @@ def update_search_results_name_and_nutrients(
         api_search_endpoint,
         params={"query": searchbar_input, "api_key": api_search_key}
     ).json().get('foods')[0]
-    updated_results_name = api_search_result.get('description'),
+    updated_results_name = api_search_result.get('description')
     updated_results_nutrients = api_search_result.get('foodNutrients')
     return(updated_results_name, updated_results_nutrients)
 
