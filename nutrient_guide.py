@@ -20,6 +20,8 @@ if not 'nutrients_i_have_dict' in st.session_state:
     st.session_state['nutrients_i_have_dict'] = st.session_state['dailyvalues_blank']
 if not 'nutrients_i_need_dict' in st.session_state:
     st.session_state['nutrients_i_need_dict'] = st.session_state['dailyvalues_full']
+# if not 'results_name_and_nutrients' in st.session_state:   <-- For next step: refactoring again, combining results_name and
+#     st.session_state['results_name_and_nutrients'] = {}        results_nutrients into a single, larger dict.
 if not 'results_name' in st.session_state:
     st.session_state['results_name'] = ''
 if not 'results_nutrients' in st.session_state:
