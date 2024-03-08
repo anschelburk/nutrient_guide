@@ -1,6 +1,4 @@
-#In app:
-#from daily_values import daily_values as dv --> specify value you want.
-# dv.get('keyword') - same code as before
+# Includes daily_values and dailyvalues_blank dicts
 
 daily_values = {
     "Added sugars": {"value": 50, "unit": "g"},
