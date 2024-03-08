@@ -239,7 +239,7 @@ if __name__ == '__main__':
     with my_ingredients_list:
         st.subheader('My Ingredients List')
         print_my_nutrients_list_with_dropdown_lists(
-            st.session_state['mylist_ingredients']
+            st.session_state['cached_ingredient_names_and_nutrients'].keys()
         )
 
     with nutrients_i_have:
