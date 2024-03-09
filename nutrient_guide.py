@@ -159,22 +159,6 @@ def retrieve_api_search_data(
     updated_results_nutrients = api_search_result.get('foodNutrients')
     return(updated_results_name, updated_results_nutrients)
 
-def update_nutrients_cache_with_api_search_results(
-        searchbar_input: str,
-        nutrients_cache_to_update: dict,
-        api_search_endpoint,
-        api_search_key
-):
-    api_search_result = requests.get(
-            api_search_endpoint,
-            params={"query": searchbar_input, "api_key": api_search_key}
-        ).json().get('foods')[0]
-    ingredient_name_from_api_search = api_search_result.get('description')
-    nutrients_from_api_search = api_search_result.get('foodNutrients')
-    nutrients_cache_to_update[
-            ingredient_name_from_api_search
-        ] = nutrients_from_api_search
-
 if __name__ == '__main__':
 
     st.title('Nutrient Guide')
