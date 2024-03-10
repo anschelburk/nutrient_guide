@@ -59,6 +59,8 @@ def button_remove_from_list(
     st_button = st.button('Remove Ingredient from My List')
     if st_button:
         if api_ingredient_name in cached_ingredients_dict.keys():
+            api_ingredient_nutrients = format_json_data_as_dict(
+                api_ingredient_nutrients)
             merge_dicts_add(
                     current_nutrients_i_need_data,
                     cached_ingredients_dict[api_ingredient_name]
@@ -150,7 +152,7 @@ def retrieve_api_search_data(
         searchbar_input: str,
         api_search_endpoint,
         api_search_key
-):
+    ):
     api_search_result = requests.get(
         api_search_endpoint,
         params={"query": searchbar_input, "api_key": api_search_key}
