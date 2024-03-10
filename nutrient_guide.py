@@ -59,8 +59,6 @@ def button_remove_from_list(
     st_button = st.button('Remove Ingredient from My List')
     if st_button:
         if api_ingredient_name in cached_ingredients_dict.keys():
-            api_ingredient_nutrients = format_json_data_as_dict(
-                api_ingredient_nutrients)
             merge_dicts_add(
                     current_nutrients_i_need_data,
                     cached_ingredients_dict[api_ingredient_name]
