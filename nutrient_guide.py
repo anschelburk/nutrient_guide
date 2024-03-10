@@ -3,9 +3,15 @@ import pandas as pd
 import requests
 import streamlit as st
 
+from enum import Enum
 from recommended_daily_nutrients import recommended_daily_nutrients
 
 st.set_page_config(layout='wide')
+
+class ModifyDictsAction(Enum):
+    ADD = 1
+    SUBTRACT = 2
+    MULTIPLY = 3
 
 USDA_API_KEY = os.getenv('DEMO_KEY', "")
 SEARCH_ENDPOINT = 'https://api.nal.usda.gov/fdc/v1/foods/search'
@@ -39,13 +45,15 @@ def button_add_to_list(
                     api_ingredient_nutrients
                 )
             cached_ingredients_dict[api_ingredient_name] = api_ingredient_nutrients
-            merge_dicts_add(
+            modify_dicts(
                     current_nutrients_i_have_data,
-                    cached_ingredients_dict[api_ingredient_name]
+                    cached_ingredients_dict[api_ingredient_name],
+                    action_to_take = ModifyDictsAction.ADD
                 )
-            merge_dicts_subtract(
+            modify_dicts(
                     current_nutrients_i_need_data,
-                    cached_ingredients_dict[api_ingredient_name]
+                    cached_ingredients_dict[api_ingredient_name],
+                    action_to_take = ModifyDictsAction.SUBTRACT
                 )
         else:
             pass
@@ -59,13 +67,15 @@ def button_remove_from_list(
     st_button = st.button('Remove Ingredient from My List')
     if st_button:
         if api_ingredient_name in cached_ingredients_dict.keys():
-            merge_dicts_add(
+            modify_dicts(
                     current_nutrients_i_need_data,
-                    cached_ingredients_dict[api_ingredient_name]
+                    cached_ingredients_dict[api_ingredient_name],
+                    action_to_take = ModifyDictsAction.ADD
                 )
-            merge_dicts_subtract(
+            modify_dicts(
                     current_nutrients_i_have_data,
-                    cached_ingredients_dict[api_ingredient_name]
+                    cached_ingredients_dict[api_ingredient_name],
+                    action_to_take = ModifyDictsAction.SUBTRACT
                 )
             del cached_ingredients_dict[api_ingredient_name]
         else:
@@ -100,39 +110,19 @@ def _normalize_nutrient_names(current_nutrients: dict, new_nutrients: dict):
     }
     return current_nutrients, new_nutrients
 
-def merge_dicts_add(current_nutrients: dict, new_nutrients: dict):
-    """
-    Adds the values of new_nutrients to current_nutrients. Returns a modified
-    version of current_nutrients.
-    """
+def modify_dicts(current_nutrients: dict,
+                 new_nutrients: dict,
+                 action_to_take: ModifyDictsAction):
     current_nutrients, new_nutrients = _normalize_nutrient_names(
-        current_nutrients, new_nutrients
-    )
-
+        current_nutrients, new_nutrients)
     for key in new_nutrients:
         if key in current_nutrients.keys():
-            current_nutrients[key]['value'] += new_nutrients[key]['value']
+            if action_to_take == ModifyDictsAction.ADD:
+                current_nutrients[key]['value'] += new_nutrients[key]['value']
+            elif action_to_take == ModifyDictsAction.SUBTRACT:
+                current_nutrients[key]['value'] -= new_nutrients[key]['value']
         else:
             current_nutrients[key] = new_nutrients[key]
-    return current_nutrients
-
-def merge_dicts_subtract(current_nutrients: dict, new_nutrients: dict):
-    """
-    Subtracts the values of new_nutrients from current_nutrients. Returns a modified
-    version of current_nutrients.
-    """
-    for key in new_nutrients:
-        stripped_key = key.split(',')[0]
-        if key in current_nutrients.keys():
-            current_nutrients[key]['value'] -= new_nutrients[key]['value']
-        else:
-            if ',' in key:
-                if stripped_key in current_nutrients.keys():
-                    current_nutrients[stripped_key]['value'] -= new_nutrients[key]['value']
-                else:
-                    current_nutrients[key] = new_nutrients[key]
-            else:
-                current_nutrients[key] = new_nutrients[key]
     return current_nutrients
 
 def print_my_nutrients_list_with_dropdown_lists(list_of_my_nutrients: list):
