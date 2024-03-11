@@ -135,12 +135,11 @@ def modify_dicts(current_nutrients: dict,
 def print_my_nutrients_list_with_dropdown_lists(list_of_my_nutrients: list):
     for item in list_of_my_nutrients:
         st.write(item)
-        st.selectbox(
+        st.session_state[f'st_selectbox_{item}'] = st.selectbox(
             'Please select how many of this food item you would like:',
             list(range(0, 11)),
             index = 1,
-            key = item
-        )
+            key = item)
         st.write('\n')
 
 def retrieve_api_search_data(
@@ -155,6 +154,39 @@ def retrieve_api_search_data(
     updated_results_name = api_search_result.get('description')
     updated_results_nutrients = api_search_result.get('foodNutrients')
     return(updated_results_name, updated_results_nutrients)
+
+def update_ingredient_quantities(
+        cached_ingredients: dict,
+        current_nutrients_i_have: dict,
+        current_nutrients_i_need: dict):
+    list_of_my_nutrients = cached_ingredients.keys()
+    for item in list_of_my_nutrients:
+        cached_ingredient_quantity = cached_ingredients[item]['quantity']
+        cached_ingredient_nutrients = cached_ingredients[item]['nutrients']
+        if st.session_state[f'st_selectbox_{item}'] != cached_ingredient_quantity:
+            modify_dicts(
+                current_nutrients = current_nutrients_i_need,
+                new_nutrients = cached_ingredient_nutrients,
+                ingredient_quantity = cached_ingredient_quantity,
+                action_to_take = ModifyDictsAction.ADD)
+            modify_dicts(
+                current_nutrients = current_nutrients_i_have,
+                new_nutrients = cached_ingredient_nutrients,
+                ingredient_quantity = cached_ingredient_quantity,
+                action_to_take = ModifyDictsAction.SUBTRACT)
+            cached_ingredient_quantity = st.session_state[f'st_selectbox_{item}']
+            modify_dicts(
+                current_nutrients = current_nutrients_i_have,
+                new_nutrients = cached_ingredient_nutrients,
+                ingredient_quantity = cached_ingredient_quantity,
+                action_to_take = ModifyDictsAction.ADD)
+            modify_dicts(
+                current_nutrients = current_nutrients_i_need,
+                new_nutrients = cached_ingredient_nutrients,
+                ingredient_quantity = cached_ingredient_quantity,
+                action_to_take = ModifyDictsAction.SUBTRACT)
+        else:
+            pass
 
 if __name__ == '__main__':
 
@@ -212,8 +244,12 @@ if __name__ == '__main__':
     with my_ingredients_list:
         st.subheader('My Ingredients List')
         print_my_nutrients_list_with_dropdown_lists(
-            st.session_state['cached_ingredient_names_and_nutrients'].keys()
-        )
+                st.session_state['cached_ingredient_names_and_nutrients'].keys()
+            )
+        update_ingredient_quantities(
+            cached_ingredients = st.session_state['cached_ingredient_names_and_nutrients'],
+            current_nutrients_i_have = st.session_state['nutrients_i_have_dict'],
+            current_nutrients_i_need = st.session_state['nutrients_i_need_dict'])
 
     with nutrients_i_have:
         st.subheader('Nutrients I Have')
