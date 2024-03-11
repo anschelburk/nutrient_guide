@@ -28,7 +28,7 @@ if not 'nutrients_i_have_dict' in st.session_state:
                 } for key, value in recommended_daily_nutrients.items()
         }
 if not 'nutrients_i_need_dict' in st.session_state:
-    st.session_state['nutrients_i_need_dict'] = recommended_daily_nutrients
+    st.session_state['nutrients_i_need_dict'] = {recommended_daily_nutrients}
 
 def button_add_to_list(
         cached_ingredients_dict: dict,
@@ -57,8 +57,6 @@ def button_add_to_list(
                 cached_ingredients_dict[api_ingredient_name]['nutrients'],
                 ingredient_quantity = default_ingredient_quantity,
                 action_to_take = ModifyDictsAction.SUBTRACT)
-        else:
-            pass
 
 def button_remove_from_list(
         cached_ingredients_dict: dict,
@@ -83,8 +81,6 @@ def button_remove_from_list(
                 ingredient_quantity = cached_ingredient_quantity,
                 action_to_take = ModifyDictsAction.SUBTRACT)
             del cached_ingredients_dict[api_ingredient_name]
-        else:
-            pass
 
 def draw_table_daily_values(data_source: dict):
     st.write(
@@ -137,7 +133,8 @@ def print_my_nutrients_list_with_dropdown_lists(cached_ingredients: dict):
         st.write(item)
         st.session_state[f'st_selectbox_{item}'] = st.selectbox(
             'Please select how many of this food item you would like:',
-            ['Remove ingredient from list', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ['Remove ingredient from list'] + list(range(1, 11),)
+            # ['Remove ingredient from list', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             # list(range(1, 11)),
             index = 1,
             key = item)
@@ -219,10 +216,8 @@ if __name__ == '__main__':
         if st.session_state['search']:
             (st.session_state['api_search_results_name'],
              st.session_state['api_search_results_nutrients']) = retrieve_api_search_data(
-                searchbar_input = st.session_state['search'],
-                api_search_endpoint = SEARCH_ENDPOINT,
-                api_search_key = USDA_API_KEY
-            )
+                st.session_state['search'], SEARCH_ENDPOINT, USDA_API_KEY)
+
             st.write('Showing results for:', st.session_state['api_search_results_name'])
             button_add_to_list(
                     cached_ingredients_dict = st.session_state[
