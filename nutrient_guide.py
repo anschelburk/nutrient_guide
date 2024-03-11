@@ -165,37 +165,42 @@ def update_ingredient_quantities(
         cached_ingredients: dict,
         current_nutrients_i_have: dict,
         current_nutrients_i_need: dict):
-    list_of_my_nutrients = cached_ingredients.keys()
+    list_of_my_nutrients = list(cached_ingredients.keys()) # <-- Does that solve the problem?
     for item in list_of_my_nutrients:
         cached_ingredient_quantity = cached_ingredients[item]['quantity']
         cached_ingredient_nutrients = cached_ingredients[item]['nutrients']
         if st.session_state[f'st_selectbox_{item}'] != cached_ingredient_quantity:
-            modify_dicts(
-                current_nutrients = current_nutrients_i_need,
-                new_nutrients = cached_ingredient_nutrients,
-                ingredient_quantity = cached_ingredient_quantity,
-                action_to_take = ModifyDictsAction.ADD)
+            if st.session_state[f'st_selectbox_{item}'] == 'Remove ingredient from list':
+                quantity_difference = -1 * cached_ingredient_nutrients
+                # del cached_ingredients[item]
+            # else:
+            else:
+                quantity_difference = st.session_state[f'st_selectbox_{item}'] - cached_ingredient_quantity
             modify_dicts(
                 current_nutrients = current_nutrients_i_have,
                 new_nutrients = cached_ingredient_nutrients,
-                ingredient_quantity = cached_ingredient_quantity,
+                ingredient_quantity = quantity_difference,
+                action_to_take = ModifyDictsAction.ADD)
+            modify_dicts(
+                current_nutrients = current_nutrients_i_need,
+                new_nutrients = cached_ingredient_nutrients,
+                ingredient_quantity = quantity_difference,
                 action_to_take = ModifyDictsAction.SUBTRACT)
-            if st.session_state[f'st_selectbox_{item}'] == 'Remove ingredient from list':
-                del cached_ingredients[item]
-            else:
-                cached_ingredient_quantity = st.session_state[f'st_selectbox_{item}']
-                modify_dicts(
-                    current_nutrients = current_nutrients_i_have,
-                    new_nutrients = cached_ingredient_nutrients,
-                    ingredient_quantity = cached_ingredient_quantity,
-                    action_to_take = ModifyDictsAction.ADD)
-                modify_dicts(
-                    current_nutrients = current_nutrients_i_need,
-                    new_nutrients = cached_ingredient_nutrients,
-                    ingredient_quantity = cached_ingredient_quantity,
-                    action_to_take = ModifyDictsAction.SUBTRACT)
-        else:
-            pass
+            # if st.session_state[f'st_selectbox_{item}'] == 'Remove ingredient from list':
+            #     del cached_ingredients[item]
+            # else:
+            #     # Update the ingredient quantity
+            #     cached_ingredient_quantity = st.session_state[f'st_selectbox_{item}']
+            #     modify_dicts(  # <-- Add the new quantity to Nutrients I Have
+            #         current_nutrients = current_nutrients_i_have,
+            #         new_nutrients = cached_ingredient_nutrients,
+            #         ingredient_quantity = cached_ingredient_quantity,
+            #         action_to_take = ModifyDictsAction.ADD)
+            #     modify_dicts(  # <-- Subtract the new quantity from Nutrients I Need
+            #         current_nutrients = current_nutrients_i_need,
+            #         new_nutrients = cached_ingredient_nutrients,
+            #         ingredient_quantity = cached_ingredient_quantity,
+            #         action_to_take = ModifyDictsAction.SUBTRACT)
 
 if __name__ == '__main__':
 
