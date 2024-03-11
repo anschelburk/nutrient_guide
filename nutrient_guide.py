@@ -28,7 +28,7 @@ if not 'nutrients_i_have_dict' in st.session_state:
                 } for key, value in recommended_daily_nutrients.items()
         }
 if not 'nutrients_i_need_dict' in st.session_state:
-    st.session_state['nutrients_i_need_dict'] = {recommended_daily_nutrients}
+    st.session_state['nutrients_i_need_dict'] = dict(recommended_daily_nutrients)
 
 def button_add_to_list(
         cached_ingredients_dict: dict,
@@ -133,9 +133,7 @@ def print_my_nutrients_list_with_dropdown_lists(cached_ingredients: dict):
         st.write(item)
         st.session_state[f'st_selectbox_{item}'] = st.selectbox(
             'Please select how many of this food item you would like:',
-            ['Remove ingredient from list'] + list(range(1, 11),)
-            # ['Remove ingredient from list', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            # list(range(1, 11)),
+            ['Remove ingredient from list'] + [number for number in range(1, 11)],
             index = 1,
             key = item)
         # button_remove_from_list(
@@ -143,7 +141,7 @@ def print_my_nutrients_list_with_dropdown_lists(cached_ingredients: dict):
         #     api_ingredient_name = item,
         #     current_nutrients_i_have_data = st.session_state['nutrients_i_have_dict'],
         #     current_nutrients_i_need_data = st.session_state['nutrients_i_need_dict'])
-        # st.write('\n')
+        st.write('\n')
 
 def retrieve_api_search_data(
         searchbar_input: str,
