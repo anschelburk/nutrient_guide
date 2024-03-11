@@ -240,7 +240,7 @@ if __name__ == '__main__':
             #             'nutrients_i_have_dict'],
             #         current_nutrients_i_need_data = st.session_state[
             #             'nutrients_i_need_dict']
-            #     )
+            #     ) 
             draw_table_daily_values(
                 format_json_data_as_dict(
                     st.session_state['api_search_results_nutrients']
