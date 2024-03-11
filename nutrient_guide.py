@@ -11,7 +11,6 @@ st.set_page_config(layout='wide')
 class ModifyDictsAction(Enum):
     ADD = 1
     SUBTRACT = 2
-    MULTIPLY = 3
 
 USDA_API_KEY = os.getenv('DEMO_KEY', "")
 SEARCH_ENDPOINT = 'https://api.nal.usda.gov/fdc/v1/foods/search'
@@ -39,22 +38,25 @@ def button_add_to_list(
         current_nutrients_i_need_data: dict
     ):
     st_button = st.button('Add Ingredient to My List')
+    default_ingredient_quantity = 1
     if st_button:
         if not api_ingredient_name in cached_ingredients_dict.keys():
             api_ingredient_nutrients = format_json_data_as_dict(
-                    api_ingredient_nutrients
-                )
-            cached_ingredients_dict[api_ingredient_name] = api_ingredient_nutrients
+                    api_ingredient_nutrients)
+            cached_ingredients_dict[api_ingredient_name] = {
+                'quantity': default_ingredient_quantity,
+                'nutrients': api_ingredient_nutrients}
             modify_dicts(
-                    current_nutrients_i_have_data,
-                    cached_ingredients_dict[api_ingredient_name],
-                    action_to_take = ModifyDictsAction.ADD
-                )
+                current_nutrients = current_nutrients_i_have_data,
+                new_nutrients = cached_ingredients_dict[
+                    api_ingredient_name]['nutrients'],
+                ingredient_quantity = default_ingredient_quantity,
+                action_to_take = ModifyDictsAction.ADD)
             modify_dicts(
-                    current_nutrients_i_need_data,
-                    cached_ingredients_dict[api_ingredient_name],
-                    action_to_take = ModifyDictsAction.SUBTRACT
-                )
+                current_nutrients_i_need_data,
+                cached_ingredients_dict[api_ingredient_name]['nutrients'],
+                ingredient_quantity = default_ingredient_quantity,
+                action_to_take = ModifyDictsAction.SUBTRACT)
         else:
             pass
 
@@ -66,17 +68,21 @@ def button_remove_from_list(
     ):
     st_button = st.button('Remove Ingredient from My List')
     if st_button:
+        cached_ingredient_quantity = cached_ingredients_dict[
+            api_ingredient_name]['quantity']
         if api_ingredient_name in cached_ingredients_dict.keys():
             modify_dicts(
-                    current_nutrients_i_need_data,
-                    cached_ingredients_dict[api_ingredient_name],
-                    action_to_take = ModifyDictsAction.ADD
-                )
+                current_nutrients = current_nutrients_i_need_data,
+                new_nutrients = cached_ingredients_dict[
+                    api_ingredient_name]['nutrients'],
+                ingredient_quantity = cached_ingredient_quantity,
+                action_to_take = ModifyDictsAction.ADD)
             modify_dicts(
-                    current_nutrients_i_have_data,
-                    cached_ingredients_dict[api_ingredient_name],
-                    action_to_take = ModifyDictsAction.SUBTRACT
-                )
+                current_nutrients = current_nutrients_i_have_data,
+                new_nutrients = cached_ingredients_dict[
+                    api_ingredient_name]['nutrients'],
+                ingredient_quantity = cached_ingredient_quantity,
+                action_to_take = ModifyDictsAction.SUBTRACT)
             del cached_ingredients_dict[api_ingredient_name]
         else:
             pass
@@ -112,15 +118,16 @@ def _normalize_nutrient_names(current_nutrients: dict, new_nutrients: dict):
 
 def modify_dicts(current_nutrients: dict,
                  new_nutrients: dict,
+                 ingredient_quantity: int,
                  action_to_take: ModifyDictsAction):
     current_nutrients, new_nutrients = _normalize_nutrient_names(
         current_nutrients, new_nutrients)
     for key in new_nutrients:
         if key in current_nutrients.keys():
             if action_to_take == ModifyDictsAction.ADD:
-                current_nutrients[key]['value'] += new_nutrients[key]['value']
+                current_nutrients[key]['value'] += (new_nutrients[key]['value'] * ingredient_quantity)
             elif action_to_take == ModifyDictsAction.SUBTRACT:
-                current_nutrients[key]['value'] -= new_nutrients[key]['value']
+                current_nutrients[key]['value'] -= (new_nutrients[key]['value'] * ingredient_quantity)
         else:
             current_nutrients[key] = new_nutrients[key]
     return current_nutrients
