@@ -1,3 +1,4 @@
+import copy
 import os
 import pandas as pd
 import requests
@@ -162,15 +163,17 @@ def update_ingredient_quantities(
         current_nutrients_i_need: dict):
     list_of_my_nutrients = list(cached_ingredients.keys()) # <-- Does that solve the problem?
     for item in list_of_my_nutrients:
+        dropbox_ingredient_quantity = st.session_state[f'st_selectbox_{item}']
         cached_ingredient_quantity = cached_ingredients[item]['quantity']
         cached_ingredient_nutrients = cached_ingredients[item]['nutrients']
-        if st.session_state[f'st_selectbox_{item}'] != cached_ingredient_quantity:
-            if st.session_state[f'st_selectbox_{item}'] == 'Remove ingredient from list':
-                quantity_difference = -1 * cached_ingredient_nutrients
+        if dropbox_ingredient_quantity != cached_ingredient_quantity:
+            if dropbox_ingredient_quantity == 'Remove ingredient from list':
+                quantity_difference = -1 * cached_ingredient_quantity
+                # Add to a new list called ingredients_to_delete, NEEDS TO BE FIRST DEFINED AS BLANK
                 # del cached_ingredients[item]
-            # else:
             else:
-                quantity_difference = st.session_state[f'st_selectbox_{item}'] - cached_ingredient_quantity
+                quantity_difference = dropbox_ingredient_quantity - cached_ingredient_quantity
+            # breakpoint()
             modify_dicts(
                 current_nutrients = current_nutrients_i_have,
                 new_nutrients = cached_ingredient_nutrients,
@@ -181,6 +184,7 @@ def update_ingredient_quantities(
                 new_nutrients = cached_ingredient_nutrients,
                 ingredient_quantity = quantity_difference,
                 action_to_take = ModifyDictsAction.SUBTRACT)
+            cached_ingredient_quantity = copy.copy(dropbox_ingredient_quantity)
             # if st.session_state[f'st_selectbox_{item}'] == 'Remove ingredient from list':
             #     del cached_ingredients[item]
             # else:
