@@ -3,8 +3,6 @@ import os
 
 import requests
 
-from recommended_daily_nutrients import recommended_daily_nutrients
-
 USDA_API_KEY = os.getenv("DEMO_KEY", "")
 SEARCH_ENDPOINT = "https://api.nal.usda.gov/fdc/v1/foods/search"
 
