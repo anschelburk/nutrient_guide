@@ -23,11 +23,11 @@ class NutrientCalculator:
             defaultdict(float) if target_ingredients is None else target_ingredients
         )
         # cache of food api infos
-        self.nutrient_ingredient_map = {}
+        self.nutrient_ingredient_map: dict[str, dict] = {}
         # what's currently selected:
-        self.selected_nutrients = Counter()
+        self.selected_nutrients: dict[str, int] = Counter()
 
-    def _normalize_nutrient_names(self, ingredients):
+    def _normalize_ingredient_names(self, ingredients):
         return {key.split(", ")[0]: value for key, value in ingredients.items()}
 
     def get_ingredients_for_nutrient(self, nutrient):
@@ -40,14 +40,13 @@ class NutrientCalculator:
         params = {"query": nutrient, "api_key": USDA_API_KEY}
         response = requests.get(SEARCH_ENDPOINT, params=params)
         api_search_result = response.json().get("foods")[0]
-        values = api_search_result.get("foodNutrients")
-        values_parsed = {
+        ingredients_parsed = {
             val["nutrientName"]: {"value": val["value"], "unit": val["unitName"]}
-            for val in values
+            for val in api_search_result["foodNutrients"]
         }
-        values_normalized = self._normalize_nutrient_names(values_parsed)
-        self.nutrient_ingredient_map[nutrient] = values_normalized
-        return values_normalized
+        ingredients_normalized = self._normalize_ingredient_names(ingredients_parsed)
+        self.nutrient_ingredient_map[nutrient] = ingredients_normalized
+        return ingredients_normalized
 
     def add_nutrient(self, nutrient, amount):
         self.selected_nutrients[nutrient] += amount

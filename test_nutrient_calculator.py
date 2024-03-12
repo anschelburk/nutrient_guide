@@ -7,7 +7,7 @@ from nutrient_calculator import NutrientCalculator
 
 @pytest.fixture
 def ncalc():
-    ncalc = NutrientCalculator()
+    ncalc = NutrientCalculator({}, {})
     ncalc.nutrient_ingredient_map = {
         "apple": {
             "Vitamin C": {"value": 1, "unit": "mg"},
