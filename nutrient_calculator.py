@@ -39,7 +39,7 @@ class NutrientCalculator:
         # not in cache, call the API
         params = {"query": nutrient, "api_key": USDA_API_KEY}
         response = requests.get(SEARCH_ENDPOINT, params=params)
-        api_search_result = response.json().get("foods")[0]
+        api_search_result = response.json()["foods"][0]
         ingredients_parsed = {
             val["nutrientName"]: {"value": val["value"], "unit": val["unitName"]}
             for val in api_search_result["foodNutrients"]
