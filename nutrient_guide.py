@@ -3,9 +3,7 @@ import pandas as pd
 import requests
 import streamlit as st
 
-from copy import deepcopy
 from enum import Enum
-from nutrient_calculator import NutrientCalculator
 from recommended_daily_nutrients import recommended_daily_nutrients
 
 st.set_page_config(layout='wide')
@@ -169,12 +167,12 @@ def update_ingredient_quantities(
         cached_ingredient_nutrients = cached_ingredients[item]['nutrients']
         if dropdown_ingredient_quantity != cached_ingredient_quantity:
             if dropdown_ingredient_quantity == 'Remove ingredient from list':
+                dropdown_ingredient_quantity = 0
                 quantity_difference = -1 * cached_ingredient_quantity
                 # Add to a new list called ingredients_to_delete, NEEDS TO BE FIRST DEFINED AS BLANK
                 # del cached_ingredients[item]
             else:
                 quantity_difference = dropdown_ingredient_quantity - cached_ingredient_quantity
-            # breakpoint()
             modify_dicts(
                 current_nutrients = current_nutrients_i_have,
                 new_nutrients = cached_ingredient_nutrients,
