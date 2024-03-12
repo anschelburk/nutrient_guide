@@ -22,9 +22,9 @@ class NutrientCalculator:
         self.target_ingredients = (
             defaultdict(float) if target_ingredients is None else target_ingredients
         )
-        # cache of food api infos
+        # cache of food api infos (also will make it more efficient)
         self.nutrient_ingredient_map: dict[str, dict] = {}
-        # what's currently selected:
+        # what's currently selected (nutrients and their amounts)
         self.selected_nutrients: dict[str, int] = Counter()
 
     def _normalize_ingredient_names(self, ingredients):
