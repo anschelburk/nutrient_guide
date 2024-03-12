@@ -37,5 +37,9 @@ recommended_daily_nutrients = {
     "Vitamin D": {"value": 20, "unit": "mcg"},
     "Vitamin E": {"value": 15, "unit": "mg alpha-tocopherol"},
     "Vitamin K": {"value": 120, "unit": "mcg"},
-    "Zinc": {"value": 11, "unit": "mg"}
+    "Zinc": {"value": 11, "unit": "mg"},
+}
+recommended_daily_nutrients_empty = {
+    key: {"value": 0, "unit": value["unit"]}
+    for key, value in recommended_daily_nutrients.items()
 }

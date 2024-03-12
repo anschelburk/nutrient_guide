@@ -1,40 +1,39 @@
-from collections import Counter, defaultdict
+from copy import deepcopy
+from collections import Counter
 import os
 
 import requests
+
+from recommended_daily_nutrients import (
+    recommended_daily_nutrients,
+    recommended_daily_nutrients_empty,
+)
 
 USDA_API_KEY = os.getenv("DEMO_KEY", "")
 SEARCH_ENDPOINT = "https://api.nal.usda.gov/fdc/v1/foods/search"
 
 
 class NutrientCalculator:
-    def __init__(
-        self,
-        my_ingredients: defaultdict | None = None,
-        target_ingredients: defaultdict | None = None,
-    ):
-        # the two ingredient tables
-        self.my_ingredients = (
-            defaultdict(float) if my_ingredients is None else my_ingredients
-        )
-        self.target_ingredients = (
-            defaultdict(float) if target_ingredients is None else target_ingredients
-        )
-        # cache of food api infos (also will make it more efficient)
-        self.nutrient_ingredient_map: dict[str, dict] = {}
-        # what's currently selected (nutrients and their amounts)
+
+    def __init__(self):
+        self.nutrient_ingredient_cache: dict[str, dict] = {}
         self.selected_nutrients: dict[str, int] = Counter()
+        self._reset_ingredients()
+
+    def _reset_ingredients(self):
+        mine = deepcopy(recommended_daily_nutrients_empty)
+        target = deepcopy(recommended_daily_nutrients)
+        self.my_ingredients, self.target_ingredients = mine, target
 
     def _normalize_ingredient_names(self, ingredients):
         return {key.split(", ")[0]: value for key, value in ingredients.items()}
 
     def get_ingredients_for_nutrient(self, nutrient):
         nutrient = nutrient.lower()
-        if nutrient in self.nutrient_ingredient_map:
-            print(f"Found {nutrient} in cache")
-            return self.nutrient_ingredient_map[nutrient]
+        if nutrient in self.nutrient_ingredient_cache:
+            return self.nutrient_ingredient_cache[nutrient]
 
-        # not in cache, call the API
+        # only call API if not already in cache
         params = {"query": nutrient, "api_key": USDA_API_KEY}
         response = requests.get(SEARCH_ENDPOINT, params=params)
         api_search_result = response.json()["foods"][0]
@@ -43,7 +42,7 @@ class NutrientCalculator:
             for val in api_search_result["foodNutrients"]
         }
         ingredients_normalized = self._normalize_ingredient_names(ingredients_parsed)
-        self.nutrient_ingredient_map[nutrient] = ingredients_normalized
+        self.nutrient_ingredient_cache[nutrient] = ingredients_normalized
         return ingredients_normalized
 
     def add_nutrient(self, nutrient, amount):
@@ -53,13 +52,14 @@ class NutrientCalculator:
         self.selected_nutrients[nutrient] -= amount
 
     def update_ingredients(self):
-        print("Updating ingredients")
+        self._reset_ingredients()
         for nutrient, amount in self.selected_nutrients.items():
             ingredients = self.get_ingredients_for_nutrient(nutrient)
             for ingredient, details in ingredients.items():
                 ingredient_amount = details["value"] * amount
-                self.my_ingredients[ingredient] += ingredient_amount
-                self.target_ingredients[ingredient] -= ingredient_amount
-        # from pprint import pprint as pp
-        # pp(self.my_ingredients)
-        # pp(self.target_ingredients)
+                if ingredient not in self.my_ingredients:
+                    self.my_ingredients[ingredient] = {"value": 0, "unit": details["unit"]}
+                if ingredient not in self.target_ingredients:
+                    self.target_ingredients[ingredient] = {"value": 0, "unit": details["unit"]}
+                self.my_ingredients[ingredient]["value"] += ingredient_amount
+                self.target_ingredients[ingredient]["value"] -= ingredient_amount
