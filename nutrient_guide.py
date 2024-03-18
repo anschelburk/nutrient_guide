@@ -15,12 +15,17 @@ class ModifyDictsAction(Enum):
 USDA_API_KEY = os.getenv('DEMO_KEY', "")
 SEARCH_ENDPOINT = 'https://api.nal.usda.gov/fdc/v1/foods/search'
 
+# Designed to revert to blank list on each refresh
+# initial_ingredients_list = []
+
 if not 'api_search_results_name' in st.session_state:
     st.session_state['api_search_results_name'] = ''
 if not 'api_search_results_nutrients' in st.session_state:
     st.session_state['api_search_results_nutrients'] = []
 if not 'cached_ingredient_names_and_nutrients' in st.session_state:
     st.session_state['cached_ingredient_names_and_nutrients'] = {}
+if not 'dict_items_to_delete' in st.session_state:
+    st.session_state['dict_items_to_delete'] = []
 if not 'nutrients_i_have_dict' in st.session_state:
     st.session_state['nutrients_i_have_dict'] = {
             key: {
@@ -28,7 +33,7 @@ if not 'nutrients_i_have_dict' in st.session_state:
                 } for key, value in recommended_daily_nutrients.items()
         }
 if not 'nutrients_i_need_dict' in st.session_state:
-    st.session_state['nutrients_i_need_dict'] = {recommended_daily_nutrients}
+    st.session_state['nutrients_i_need_dict'] = dict(recommended_daily_nutrients)
 
 def button_add_to_list(
         cached_ingredients_dict: dict,
@@ -133,9 +138,7 @@ def print_my_nutrients_list_with_dropdown_lists(cached_ingredients: dict):
         st.write(item)
         st.session_state[f'st_selectbox_{item}'] = st.selectbox(
             'Please select how many of this food item you would like:',
-            ['Remove ingredient from list'] + list(range(1, 11),)
-            # ['Remove ingredient from list', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            # list(range(1, 11)),
+            ['Remove ingredient from list'] + [number for number in range(1, 11)],
             index = 1,
             key = item)
         # button_remove_from_list(
@@ -143,7 +146,7 @@ def print_my_nutrients_list_with_dropdown_lists(cached_ingredients: dict):
         #     api_ingredient_name = item,
         #     current_nutrients_i_have_data = st.session_state['nutrients_i_have_dict'],
         #     current_nutrients_i_need_data = st.session_state['nutrients_i_need_dict'])
-        # st.write('\n')
+        st.write('\n')
 
 def retrieve_api_search_data(
         searchbar_input: str,
@@ -158,46 +161,70 @@ def retrieve_api_search_data(
     updated_results_nutrients = api_search_result.get('foodNutrients')
     return(updated_results_name, updated_results_nutrients)
 
+def update_list_to_remove(
+    list_to_remove: list,
+    cached_ingredients: list
+):
+    list_to_remove.clear()
+    for key in cached_ingredients:
+        if cached_ingredients[key]['quantity'] == 0:
+            list_to_remove.append(key)
+    return list_to_remove
+    
+
+def delete_removed_dict_items(
+    cached_ingredients: dict,
+    list_to_delete: list        
+):
+    # list_to_delete = []
+    # # breakpoint()
+    # for key in cached_ingredients:
+    #     if cached_ingredients[key]['quantity'] == 0:
+    #         list_to_delete.append(key)
+    # breakpoint()
+    for item in list_to_delete:
+        del cached_ingredients[item]
+    # breakpoint()
+
 def update_ingredient_quantities(
-        cached_ingredients: dict,
-        current_nutrients_i_have: dict,
-        current_nutrients_i_need: dict):
-    list_of_my_nutrients = list(cached_ingredients.keys()) # <-- Does that solve the problem?
-    for item in list_of_my_nutrients:
-        cached_ingredient_quantity = cached_ingredients[item]['quantity']
-        cached_ingredient_nutrients = cached_ingredients[item]['nutrients']
-        if st.session_state[f'st_selectbox_{item}'] != cached_ingredient_quantity:
-            if st.session_state[f'st_selectbox_{item}'] == 'Remove ingredient from list':
-                quantity_difference = -1 * cached_ingredient_nutrients
-                # del cached_ingredients[item]
-            # else:
-            else:
-                quantity_difference = st.session_state[f'st_selectbox_{item}'] - cached_ingredient_quantity
-            modify_dicts(
-                current_nutrients = current_nutrients_i_have,
-                new_nutrients = cached_ingredient_nutrients,
-                ingredient_quantity = quantity_difference,
-                action_to_take = ModifyDictsAction.ADD)
-            modify_dicts(
-                current_nutrients = current_nutrients_i_need,
-                new_nutrients = cached_ingredient_nutrients,
-                ingredient_quantity = quantity_difference,
-                action_to_take = ModifyDictsAction.SUBTRACT)
-            # if st.session_state[f'st_selectbox_{item}'] == 'Remove ingredient from list':
-            #     del cached_ingredients[item]
-            # else:
-            #     # Update the ingredient quantity
-            #     cached_ingredient_quantity = st.session_state[f'st_selectbox_{item}']
-            #     modify_dicts(  # <-- Add the new quantity to Nutrients I Have
-            #         current_nutrients = current_nutrients_i_have,
-            #         new_nutrients = cached_ingredient_nutrients,
-            #         ingredient_quantity = cached_ingredient_quantity,
-            #         action_to_take = ModifyDictsAction.ADD)
-            #     modify_dicts(  # <-- Subtract the new quantity from Nutrients I Need
-            #         current_nutrients = current_nutrients_i_need,
-            #         new_nutrients = cached_ingredient_nutrients,
-            #         ingredient_quantity = cached_ingredient_quantity,
-            #         action_to_take = ModifyDictsAction.SUBTRACT)
+    cached_ingredients: dict,
+    current_nutrients_i_have: dict,
+    current_nutrients_i_need: dict
+    # list_to_delete: list
+):
+    ingredients_list = st.container()
+    with ingredients_list:
+        list_of_my_nutrients = list(cached_ingredients.keys()) # <-- Does that solve the problem?
+        for item in list_of_my_nutrients:
+            dropdown_option = st.session_state[f'st_selectbox_{item}']
+            cached_ingredient_quantity = cached_ingredients[item]['quantity']
+            cached_ingredient_nutrients = cached_ingredients[item]['nutrients']
+            if dropdown_option != cached_ingredient_quantity:
+                if dropdown_option == 'Remove ingredient from list':
+                    dropdown_ingredient_quantity = 0
+                    quantity_difference = -1 * cached_ingredient_quantity
+                    # Add to a new list called ingredients_to_delete, NEEDS TO BE FIRST DEFINED AS BLANK
+                    # del cached_ingredients[item]
+                else:
+                    dropdown_ingredient_quantity = dropdown_option
+                    quantity_difference = dropdown_ingredient_quantity - cached_ingredient_quantity
+                modify_dicts(
+                    current_nutrients = current_nutrients_i_have,
+                    new_nutrients = cached_ingredient_nutrients,
+                    ingredient_quantity = quantity_difference,
+                    action_to_take = ModifyDictsAction.ADD
+                )
+                modify_dicts(
+                    current_nutrients = current_nutrients_i_need,
+                    new_nutrients = cached_ingredient_nutrients,
+                    ingredient_quantity = quantity_difference,
+                    action_to_take = ModifyDictsAction.SUBTRACT
+                )
+                cached_ingredients[item]['quantity'] = dropdown_ingredient_quantity
+    # _delete_removed_dict_items(
+    #     cached_ingredients = cached_ingredients,
+    #     list_to_delete = list_to_delete
+    # )
 
 if __name__ == '__main__':
 
@@ -240,7 +267,7 @@ if __name__ == '__main__':
             #             'nutrients_i_have_dict'],
             #         current_nutrients_i_need_data = st.session_state[
             #             'nutrients_i_need_dict']
-            #     )
+            #     ) 
             draw_table_daily_values(
                 format_json_data_as_dict(
                     st.session_state['api_search_results_nutrients']
@@ -252,12 +279,26 @@ if __name__ == '__main__':
 
     with my_ingredients_list:
         st.subheader('My Ingredients List')
+        update_list_to_remove(
+            list_to_remove = st.session_state['dict_items_to_delete'],
+            cached_ingredients = st.session_state['cached_ingredient_names_and_nutrients']
+        )
+        # breakpoint()
+        delete_removed_dict_items(
+            cached_ingredients = st.session_state['cached_ingredient_names_and_nutrients'],
+            list_to_delete = st.session_state['dict_items_to_delete']
+        )
+        # breakpoint()
         print_my_nutrients_list_with_dropdown_lists(
-                st.session_state['cached_ingredient_names_and_nutrients'])
+                st.session_state['cached_ingredient_names_and_nutrients']
+        )
         update_ingredient_quantities(
             cached_ingredients = st.session_state['cached_ingredient_names_and_nutrients'],
             current_nutrients_i_have = st.session_state['nutrients_i_have_dict'],
-            current_nutrients_i_need = st.session_state['nutrients_i_need_dict'])
+            current_nutrients_i_need = st.session_state['nutrients_i_need_dict']
+            # list_to_delete = st.session_state['dict_items_to_delete']
+        )
+
 
     with nutrients_i_have:
         st.subheader('Nutrients I Have')
