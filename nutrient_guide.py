@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import streamlit as st
 
+from decouple import config
 from enum import Enum
 from recommended_daily_nutrients import recommended_daily_nutrients
 
@@ -12,7 +13,9 @@ class ModifyDictsAction(Enum):
     ADD = 1
     SUBTRACT = 2
 
-USDA_API_KEY = os.getenv('DEMO_KEY', "")
+USDA_API_KEY = config('API_KEY')
+# USDA_API_KEY = os.getenv('API_KEY', "")
+# api_search_key = USDA_API_KEY
 SEARCH_ENDPOINT = 'https://api.nal.usda.gov/fdc/v1/foods/search'
 
 # Designed to revert to blank list on each refresh
@@ -52,6 +55,7 @@ def button_add_to_list(
                 'quantity': default_ingredient_quantity,
                 'nutrients': api_ingredient_nutrients}
             modify_dicts(
+
                 current_nutrients = current_nutrients_i_have_data,
                 new_nutrients = cached_ingredients_dict[
                     api_ingredient_name]['nutrients'],
@@ -229,6 +233,7 @@ def update_ingredient_quantities(
 if __name__ == '__main__':
 
     st.title('Nutrient Guide')
+    st.write('Copyright © 2024 Anschel Burk. All rights reserved.')
 
     (search_an_ingredient,
         my_ingredients_list,
