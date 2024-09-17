@@ -1,6 +1,6 @@
 # Nutrient Guide
 
-Copyright © 2024 Anschel Burk. All rights not explicitly granted in this project's license reserved.
+Copyright © 2024 Anschel Burk. All rights not explicitly granted in [this project's license](LICENSE.txt) reserved.
 
 ## 1. Description
 
@@ -10,7 +10,7 @@ This app is powered by [Streamlit](https://streamlit.io/), and uses data from th
 
 ## 2. License
 
-Copyright © 2024 Anschel Burk. All rights not explicitly granted in this project's license reserved.
+Copyright © 2024 Anschel Burk. All rights not explicitly granted in [this project's license](LICENSE.txt) reserved.
 
 ### 2A. License Notice: Streamlit
 
@@ -109,5 +109,9 @@ Activate the app by running the following command from the project directory:
 ```
 streamlit run nutrient_guide.py
 ```
+
+This will run the project in a local server, and initiate a server log in your terminal window.
+
+To stop the server at any time (regardless of operating system), select the terminal window with the server log running, and type `CTRL` `C`.
 
 Enjoy!
