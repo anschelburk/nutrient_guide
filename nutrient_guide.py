@@ -233,7 +233,7 @@ def update_ingredient_quantities(
 if __name__ == '__main__':
 
     st.title('Nutrient Guide')
-    st.write(f"Copyright © 2024 Anschel Burk. All rights not explicitly granted in [this project's license](https://github.com/anschelburk/nutrient-guide/blob/main/LICENSE.txt) reserved.")
+    st.write(f"Copyright © 2024 Anschel Burk. All rights not explicitly granted in [this project's license](https://github.com/anschelburk/nutrient_guide/blob/main/LICENSE.txt) reserved.")
 
     (search_an_ingredient,
         my_ingredients_list,
