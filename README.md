@@ -80,7 +80,7 @@ For instructions on how to add your API key to your local repo's environment var
 
 This app uses the `python-decouple` library to manage environment variables, using a local `.env` file which must be configured prior to use.
 
-After cloning this repository, copy the included `.env_template`, and name the copy `.env`. You'll find that the file contains a single line:
+After cloning this repository, copy the included [`.env_template`](.env_template) file in the project directory, and name the copy `.env`. You'll find that the file contains a single line:
 
 ```
 API_KEY = 
