@@ -1,11 +1,13 @@
+# Main app: Nutrieng Guide
+
 import os
 import pandas as pd
 import requests
 import streamlit as st
 
 from decouple import config
+from static.recommended_daily_nutrients import recommended_daily_nutrients
 from enum import Enum
-from recommended_daily_nutrients import recommended_daily_nutrients
 
 st.set_page_config(layout='wide')
 

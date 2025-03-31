@@ -1,13 +1,11 @@
-from copy import deepcopy
-from collections import Counter
-import os
+# Nutrient Calculator
 
+import os
 import requests
 
-from recommended_daily_nutrients import (
-    recommended_daily_nutrients,
-    recommended_daily_nutrients_empty,
-)
+from copy import deepcopy
+from collections import Counter
+from static.recommended_daily_nutrients import recommended_daily_nutrients, recommended_daily_nutrients_empty
 
 USDA_API_KEY = os.getenv("DEMO_KEY", "")
 SEARCH_ENDPOINT = "https://api.nal.usda.gov/fdc/v1/foods/search"
