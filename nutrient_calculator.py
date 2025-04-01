@@ -5,7 +5,7 @@ import requests
 
 from copy import deepcopy
 from collections import Counter
-from static.recommended_daily_nutrients import recommended_daily_nutrients, recommended_daily_nutrients_empty
+from static.recommended_daily_nutrients_lists import recommended_daily_nutrients, recommended_daily_nutrients_empty
 
 USDA_API_KEY = os.getenv("DEMO_KEY", "")
 SEARCH_ENDPOINT = "https://api.nal.usda.gov/fdc/v1/foods/search"
