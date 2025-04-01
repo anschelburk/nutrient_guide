@@ -18,8 +18,6 @@ class ModifyDictsAction(Enum):
 USDA_API_KEY = config('API_KEY')
 SEARCH_ENDPOINT = 'https://api.nal.usda.gov/fdc/v1/foods/search'
 
-# Because Streamlit reverts to blank lists on each refresh
-
 if not 'api_search_results_name' in st.session_state:
     st.session_state['api_search_results_name'] = ''
 if not 'api_search_results_nutrients' in st.session_state:
