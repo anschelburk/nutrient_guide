@@ -1,4 +1,4 @@
-# Main app: Nutrient Guide
+# Main App: Nutrient Guide
 
 import os
 import pandas as pd
@@ -6,8 +6,8 @@ import requests
 import streamlit as st
 
 from decouple import config
-from static.recommended_daily_nutrients import recommended_daily_nutrients
 from enum import Enum
+from static.recommended_daily_nutrients_lists import recommended_daily_nutrients
 
 st.set_page_config(layout='wide')
 
@@ -16,11 +16,9 @@ class ModifyDictsAction(Enum):
     SUBTRACT = 2
 
 USDA_API_KEY = config('API_KEY')
-# api_search_key = USDA_API_KEY
 SEARCH_ENDPOINT = 'https://api.nal.usda.gov/fdc/v1/foods/search'
 
-# Designed to revert to blank list on each refresh
-# initial_ingredients_list = []
+# Because Streamlit reverts to blank lists on each refresh
 
 if not 'api_search_results_name' in st.session_state:
     st.session_state['api_search_results_name'] = ''
