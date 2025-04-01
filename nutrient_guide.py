@@ -1,4 +1,4 @@
-# Main app: Nutrieng Guide
+# Main app: Nutrient Guide
 
 import os
 import pandas as pd
@@ -16,7 +16,6 @@ class ModifyDictsAction(Enum):
     SUBTRACT = 2
 
 USDA_API_KEY = config('API_KEY')
-# USDA_API_KEY = os.getenv('API_KEY', "")
 # api_search_key = USDA_API_KEY
 SEARCH_ENDPOINT = 'https://api.nal.usda.gov/fdc/v1/foods/search'
 
