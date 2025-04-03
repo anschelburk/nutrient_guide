@@ -1,8 +1,9 @@
+from database.database_models import Base, Ingredient
+from decouple import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database.database_models import Base, Ingredient  # Assuming db_models.py is in a 'database' directory
 
-DATABASE_URL = "sqlite:///./nutrient_guide.db"  # You can change this to a different database
+DATABASE_URL = config('DATABASE_URL')
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
