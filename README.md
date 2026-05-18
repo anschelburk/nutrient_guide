@@ -1,6 +1,6 @@
 # Nutrient Guide
 
-Copyright © 2024 Anschel Burk. All rights not explicitly granted in [this project's license](LICENSE.txt) reserved.
+Copyright © 2026 Anschel Burk. All rights not explicitly granted in [this project's license](LICENSE.txt) reserved.
 
 ## 1. Description
 
