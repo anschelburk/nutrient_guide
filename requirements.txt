@@ -1,5 +1,5 @@
 altair==5.5.0
-anyio==4.13.0
+anyio==4.15.1
 attrs==25.3.0
 blinker==1.9.0
 cachetools==6.1.0
@@ -37,7 +37,7 @@ streamlit==1.57.0
 tenacity==9.1.2
 toml==0.10.2
 tornado==6.5.8
-typing_extensions==4.14.1
+typing_extensions==4.16.0
 tzdata==2025.2
 urllib3==2.7.0
 uvicorn==0.47.0
